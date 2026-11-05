@@ -17,16 +17,15 @@ export interface Service {
   title: string;
   description: string;
   price: number;
-  image: string;
   gameId: number;
-  categoryId: number;
   sellerId: number;
-  rating: number;
-  reviewsCount: number;
-
+  category?: string;
   gameName?: string;
   sellerName?: string;
-  category?: string;
+  rating: number;
+  reviewsCount: number;
+  image: string;
+  categoryId: number;  
 }
 
 export interface User {

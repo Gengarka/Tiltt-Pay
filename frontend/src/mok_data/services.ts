@@ -1,4 +1,4 @@
-import type { Service } from '../types';
+/* import type { Service } from '../types';
 
 export const services: Service[] = [
   {
@@ -52,3 +52,5 @@ export const services: Service[] = [
     reviewsCount: 51,
   },
 ];
+
+*/

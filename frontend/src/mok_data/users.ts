@@ -1,3 +1,4 @@
+/*
 import type { User } from '../types';
 
 export const users: User[] = [
@@ -30,3 +31,4 @@ export const users: User[] = [
     role: 'seller',
   },
 ];
+*/

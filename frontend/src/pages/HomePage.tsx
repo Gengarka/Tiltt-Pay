@@ -1,13 +1,62 @@
+import { useEffect, useState } from 'react';
 import { FiArrowRight, FiZap } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
 import { GameCard } from '../components/home/GameCard';
 import { ServiceCard } from '../components/home/ServiceCard';
 import { Button } from '../components/ui/Button';
-import { games } from '../data/games';
-import { services } from '../data/services';
+import type { Service } from '../types';
+
+interface Game {
+  id: number;
+  name: string;
+  genre: string;
+  image: string;  
+  category: string; 
+}
+
+const API_URL = 'http://localhost:3001/api';
 
 export function HomePage() {
+  const [games, setGames] = useState<Game[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        const [gamesRes, servicesRes] = await Promise.all([
+          fetch(`${API_URL}/games`),
+          fetch(`${API_URL}/services`)
+        ]);
+
+        if (gamesRes.ok && servicesRes.ok) {
+          const gamesData = await gamesRes.json();
+          const servicesData = await servicesRes.json();
+
+          setGames(gamesData);
+          
+          const normalizedServices = servicesData.slice(0, 4).map((s: any) => ({
+            ...s,
+            image: s.image || '', 
+            rating: Number(s.rating) || 0,
+            reviewsCount: Number(s.reviewsCount) || 0,
+            price: Number(s.price) || 0,
+          }));
+          
+          setServices(normalizedServices);
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки данных для главной:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
+
   return (
     <div className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 lg:px-10">
       <section className="relative mb-12 overflow-hidden rounded-3xl border border-[#5c101e] bg-gradient-to-br from-[#3a0812] via-[#18050a] to-[#0d0305] p-7 sm:p-10 lg:p-14">
@@ -49,7 +98,6 @@ export function HomePage() {
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold">Популярные игры</h2>
-
             <p className="mt-1 text-sm text-[#805861]">
               Выбирай игру и находи нужные услуги
             </p>
@@ -65,9 +113,13 @@ export function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {games.map((game) => (
-            <GameCard key={game.id} game={game} />
-          ))}
+          {loading ? (
+             <div className="col-span-full text-center py-4 text-[#805861]">Загрузка игр...</div>
+          ) : (
+            games.map((game) => (
+              <GameCard key={game.id} game={game} />
+            ))
+          )}
         </div>
       </section>
 
@@ -75,7 +127,6 @@ export function HomePage() {
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold">Популярные услуги</h2>
-
             <p className="mt-1 text-sm text-[#805861]">
               То, что сейчас чаще всего выбирают пользователи
             </p>
@@ -91,12 +142,16 @@ export function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {services.map((service) => (
-            <ServiceCard
-              key={service.id}
-              service={service}
-            />
-          ))}
+          {loading ? (
+             <div className="col-span-full text-center py-4 text-[#805861]">Загрузка услуг...</div>
+          ) : (
+            services.map((service) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+              />
+            ))
+          )}
         </div>
       </section>
     </div>

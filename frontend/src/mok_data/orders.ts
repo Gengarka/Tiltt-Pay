@@ -1,3 +1,4 @@
+/*
 export interface Order {
   id: number;
   serviceId: number;
@@ -46,3 +47,4 @@ export const orders: Order[] = [
     status: 'cancelled',
   },
 ];
+*/
