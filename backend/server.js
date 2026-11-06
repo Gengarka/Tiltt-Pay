@@ -4,6 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg'); 
+const crypto = require('crypto');
 
 const app = express();
 
@@ -167,6 +168,48 @@ app.get('/api/orders/user/:userId', async (req, res) => {
   }
 });
 
+app.get('/api/users/:userId/favorites', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const query = `
+      SELECT
+        s.id_service AS id,
+        s.title,
+        s.description,
+        s.price,
+        s.id_game AS "gameId",
+        s.id_seller AS "sellerId",
+        s.category,
+        g.name AS "gameName",
+        u.username AS "sellerName",
+        COALESCE(AVG(r.rating), 0) AS rating,
+        COUNT(r.id_review) AS "reviewsCount"
+      FROM favorites f
+      JOIN services s ON s.id_service = f.id_service
+      LEFT JOIN games g ON g.id_game = s.id_game
+      LEFT JOIN users u ON u.id_user = s.id_seller
+      LEFT JOIN reviews r ON r.id_seller = s.id_seller
+      WHERE f.id_user = $1
+      GROUP BY s.id_service, g.name, u.username
+    `;
+
+    const result = await pool.query(query, [userId]);
+
+    const favorites = result.rows.map((service) => ({
+      ...service,
+      image: '',
+      categoryId: 0,
+    }));
+
+    res.json(favorites);
+  } catch (error) {
+    console.error('Ошибка загрузки избранного:', error.message);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+
 app.get('/api/users/:userId/profile', async (req, res) => {
   try {
     const { userId } = req.params;
@@ -200,6 +243,66 @@ app.get('/api/users/:userId/profile', async (req, res) => {
   } catch (error) {
     console.error('Ошибка загрузки профиля:', error.message);
     res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+
+function hashPassword(password) {
+  return crypto.createHash('sha256').update(password).digest('hex');
+}
+
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: 'Заполните все поля' });
+    }
+
+    const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ error: 'Пользователь с таким email уже существует' });
+    }
+
+    const hashedPassword = hashPassword(password);
+    const roleId = 3; 
+
+    const newUser = await pool.query(
+      `INSERT INTO users (id_role, login, password, email, username, balance) 
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id_user AS id, username, email, balance`,
+      [roleId, email, hashedPassword, email, username, 0]
+    );
+
+    res.status(201).json(newUser.rows[0]);
+  } catch (error) {
+    console.error('Ошибка регистрации:', error.message);
+    res.status(500).json({ error: 'Ошибка сервера при регистрации' });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Введите email и пароль' });
+    }
+
+    const hashedPassword = hashPassword(password);
+
+    const result = await pool.query(
+      'SELECT id_user AS id, username, email, balance FROM users WHERE email = $1 AND password = $2',
+      [email, hashedPassword]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Неверный email или пароль' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Ошибка входа:', error.message);
+    res.status(500).json({ error: 'Ошибка сервера при входе' });
   }
 });
 

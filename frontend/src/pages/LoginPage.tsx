@@ -1,18 +1,22 @@
 import { useState } from 'react';
 import { FiEye, FiEyeOff, FiLock, FiMail } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext'; 
+
+const API_URL = 'http://localhost:3001/api';
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth(); 
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     setError('');
 
     if (!email.trim() || !password.trim()) {
@@ -25,7 +29,31 @@ export function LoginPage() {
       return;
     }
 
-    navigate('/profile');
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Неверный email или пароль');
+      }
+
+      login(data); 
+      navigate('/profile'); 
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Что-то пошло не так');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,32 +63,16 @@ export function LoginPage() {
           <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#8e0d24] text-xl font-extrabold text-white shadow-lg shadow-[#8e0d24]/20">
             Т
           </div>
-
-          <h1 className="text-3xl font-extrabold tracking-tight">
-            С возвращением
-          </h1>
-
-          <p className="mt-2 text-sm text-[#805861]">
-            Войди в аккаунт, чтобы продолжить
-          </p>
+          <h1 className="text-3xl font-extrabold tracking-tight">С возвращением</h1>
+          <p className="mt-2 text-sm text-[#805861]">Войди в аккаунт, чтобы продолжить</p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-3xl border border-[#45101a] bg-[#100305] p-6 shadow-2xl shadow-black/20 sm:p-8"
-        >
+        <form onSubmit={handleSubmit} className="rounded-3xl border border-[#45101a] bg-[#100305] p-6 shadow-2xl shadow-black/20 sm:p-8">
           <div className="space-y-5">
             <div>
-              <label
-                htmlFor="email"
-                className="mb-2 block text-sm font-medium text-[#d9aeb6]"
-              >
-                Email
-              </label>
-
+              <label htmlFor="email" className="mb-2 block text-sm font-medium text-[#d9aeb6]">Email</label>
               <div className="relative">
                 <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#805861]" />
-
                 <input
                   id="email"
                   type="email"
@@ -74,24 +86,11 @@ export function LoginPage() {
 
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-[#d9aeb6]"
-                >
-                  Пароль
-                </label>
-
-                <button
-                  type="button"
-                  className="text-xs text-[#ff7186] transition hover:text-white"
-                >
-                  Забыли пароль?
-                </button>
+                <label htmlFor="password" className="block text-sm font-medium text-[#d9aeb6]">Пароль</label>
+                <button type="button" className="text-xs text-[#ff7186] transition hover:text-white">Забыли пароль?</button>
               </div>
-
               <div className="relative">
                 <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#805861]" />
-
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -100,16 +99,10 @@ export function LoginPage() {
                   placeholder="Введите пароль"
                   className="h-12 w-full rounded-xl border border-[#45101a] bg-[#18050a] pl-11 pr-12 text-sm text-white outline-none placeholder:text-[#69434b] transition focus:border-[#e5092f]"
                 />
-
                 <button
                   type="button"
                   onClick={() => setShowPassword((value) => !value)}
                   className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-[#805861] transition hover:bg-[#26070e] hover:text-white"
-                  aria-label={
-                    showPassword
-                      ? 'Скрыть пароль'
-                      : 'Показать пароль'
-                  }
                 >
                   {showPassword ? <FiEyeOff /> : <FiEye />}
                 </button>
@@ -125,25 +118,21 @@ export function LoginPage() {
 
           <button
             type="submit"
-            className="mt-6 h-12 w-full rounded-xl bg-[#8e0d24] text-sm font-bold text-white transition hover:bg-[#e5092f]"
+            disabled={loading}
+            className="mt-6 h-12 w-full rounded-xl bg-[#8e0d24] text-sm font-bold text-white transition hover:bg-[#e5092f] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Войти
+            {loading ? 'Вход...' : 'Войти'}
           </button>
 
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1 bg-[#45101a]" />
-            <span className="text-xs text-[#69434b]">
-              или
-            </span>
+            <span className="text-xs text-[#69434b]">или</span>
             <div className="h-px flex-1 bg-[#45101a]" />
           </div>
 
           <p className="text-center text-sm text-[#805861]">
             Нет аккаунта?{' '}
-            <Link
-              to="/register"
-              className="font-semibold text-[#ff7186] transition hover:text-white"
-            >
+            <Link to="/register" className="font-semibold text-[#ff7186] transition hover:text-white">
               Зарегистрироваться
             </Link>
           </p>
