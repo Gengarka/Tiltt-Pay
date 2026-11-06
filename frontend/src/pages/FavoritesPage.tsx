@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { FiArrowLeft, FiHeart } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext'; // <-- Импорт контекста
 
 import { ServiceCard } from '../components/home/ServiceCard';
 import type { Service } from '../types';
 
-const DEMO_USER_ID = 4;
 const API_URL = 'http://localhost:3001/api';
 
 function getGameImage(gameName?: string): string {
@@ -18,18 +18,27 @@ function getGameImage(gameName?: string): string {
 }
 
 export function FavoritesPage() {
+  const { user, isLoading } = useAuth(); 
+  const navigate = useNavigate();
+  
   const [favorites, setFavorites] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!isLoading && !user) {
+      navigate('/login');
+      return;
+    }
+
     async function loadFavorites() {
+      if (!user) return;
+      
       try {
         setLoading(true);
-        const response = await fetch(`${API_URL}/users/${DEMO_USER_ID}/favorites`);
+        const response = await fetch(`${API_URL}/users/${user.id}/favorites`);
         
         if (response.ok) {
           const data = await response.json();
-          
           const normalizedData = data.map((service: any) => ({
             ...service,
             image: service.image || getGameImage(service.gameName),
@@ -37,7 +46,6 @@ export function FavoritesPage() {
             reviewsCount: Number(service.reviewsCount) || 0,
             price: Number(service.price) || 0,
           }));
-
           setFavorites(normalizedData);
         }
       } catch (error) {
@@ -48,7 +56,11 @@ export function FavoritesPage() {
     }
 
     loadFavorites();
-  }, []);
+  }, [user, isLoading, navigate]);
+
+  if (isLoading || loading) {
+    return <div className="py-16 text-center text-[#805861]">Загрузка...</div>;
+  }
 
   return (
     <div className="mx-auto w-full max-w-7xl px-5 py-8 sm:px-8 lg:px-10">
@@ -56,27 +68,16 @@ export function FavoritesPage() {
         to="/profile"
         className="mb-6 inline-flex items-center gap-2 text-sm text-[#9e6b74] transition hover:text-white"
       >
-        <FiArrowLeft />
-        Вернуться в профиль
+        <FiArrowLeft /> Вернуться в профиль
       </Link>
 
       <div className="mb-8">
-        <p className="mb-2 text-sm font-medium text-[#e5092f]">
-          Личный кабинет
-        </p>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Избранное
-        </h1>
-        <p className="mt-2 text-sm text-[#805861]">
-          Услуги, которые вы сохранили на будущее.
-        </p>
+        <p className="mb-2 text-sm font-medium text-[#e5092f]">Личный кабинет</p>
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Избранное</h1>
+        <p className="mt-2 text-sm text-[#805861]">Услуги, которые вы сохранили на будущее.</p>
       </div>
 
-      {loading ? (
-        <div className="py-16 text-center text-[#805861]">
-          Загружаем избранное...
-        </div>
-      ) : favorites.length > 0 ? (
+      {favorites.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {favorites.map((service) => (
             <ServiceCard key={service.id} service={service} />
@@ -85,12 +86,8 @@ export function FavoritesPage() {
       ) : (
         <div className="rounded-3xl border border-[#45101a] bg-[#100305] px-5 py-16 text-center">
           <FiHeart className="mx-auto text-3xl text-[#8e0d24]" />
-          <h2 className="mt-4 text-lg font-bold">
-            В избранном пока пусто
-          </h2>
-          <p className="mt-2 text-sm text-[#805861]">
-            Добавляйте услуги в избранное, чтобы не потерять их.
-          </p>
+          <h2 className="mt-4 text-lg font-bold">В избранном пока пусто</h2>
+          <p className="mt-2 text-sm text-[#805861]">Добавляйте услуги в избранное, чтобы не потерять их.</p>
           <Link
             to="/catalog"
             className="mt-6 inline-flex rounded-xl bg-[#8e0d24] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#e5092f]"

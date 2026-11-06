@@ -6,9 +6,9 @@ import {
   FiPackage,
   FiXCircle,
 } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext'; 
 
-const DEMO_USER_ID = 4; 
 const API_URL = 'http://localhost:3001/api';
 
 const getStatusInfo = (statusName: string) => {
@@ -36,14 +36,24 @@ const getStatusInfo = (statusName: string) => {
 };
 
 export default function OrdersPage() {
+  const { user, isLoading: authLoading } = useAuth(); 
+  const navigate = useNavigate();
+  
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/login');
+      return;
+    }
+
     async function fetchOrders() {
+      if (!user) return;
+      
       try {
         setLoading(true);
-        const res = await fetch(`${API_URL}/orders/user/${DEMO_USER_ID}`);
+        const res = await fetch(`${API_URL}/orders/user/${user.id}`);
         if (res.ok) {
           const data = await res.json();
           setOrders(data);
@@ -56,7 +66,11 @@ export default function OrdersPage() {
     }
 
     fetchOrders();
-  }, []);
+  }, [user, authLoading, navigate]);
+
+  if (authLoading || loading) {
+    return <div className="py-10 text-center text-[#805861]">Загрузка заказов из БД...</div>;
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-8 sm:px-8 lg:px-10">
@@ -80,9 +94,7 @@ export default function OrdersPage() {
         </p>
       </div>
 
-      {loading ? (
-        <div className="py-10 text-center text-[#805861]">Загрузка заказов из БД...</div>
-      ) : orders.length === 0 ? (
+      {orders.length === 0 ? (
         <div className="rounded-3xl border border-[#45101a] bg-[#100305] px-5 py-16 text-center">
           <FiPackage className="mx-auto text-3xl text-[#8e0d24]" />
           <h2 className="mt-4 text-lg font-bold">Заказов пока нет</h2>

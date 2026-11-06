@@ -10,11 +10,11 @@ import {
   FiUser,
 } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext'; 
 
-const DEMO_USER_ID = 4; 
 const API_URL = 'http://localhost:3001/api';
 
-interface UserProfile {
+interface UserProfileData {
   id: number;
   username: string;
   email: string;
@@ -26,17 +26,26 @@ interface UserProfile {
 
 export function ProfilePage() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const { user: authUser, isLoading: authLoading, logout } = useAuth(); 
+  
+  const [profile, setProfile] = useState<UserProfileData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!authLoading && !authUser) {
+      navigate('/login');
+      return;
+    }
+
     async function fetchProfile() {
+      if (!authUser) return; 
+      
       try {
         setLoading(true);
-        const res = await fetch(`${API_URL}/users/${DEMO_USER_ID}/profile`);
+        const res = await fetch(`${API_URL}/users/${authUser.id}/profile`);
         if (res.ok) {
           const data = await res.json();
-          setUser(data);
+          setProfile(data);
         }
       } catch (error) {
         console.error('Ошибка при загрузке профиля:', error);
@@ -46,17 +55,18 @@ export function ProfilePage() {
     }
 
     fetchProfile();
-  }, []);
+  }, [authUser, authLoading, navigate]);
 
   const handleLogout = () => {
-    navigate('/');
+    logout(); 
+    navigate('/'); 
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return <div className="text-center py-10 text-[#805861]">Загрузка профиля...</div>;
   }
 
-  if (!user) {
+  if (!profile) {
     return <div className="text-center py-10 text-[#ff8798]">Пользователь не найден.</div>;
   }
 
@@ -71,13 +81,13 @@ export function ProfilePage() {
         <aside className="h-fit rounded-3xl border border-[#45101a] bg-[#100305] p-6">
           <div className="text-center">
             <img
-              src={user.avatar || 'https://via.placeholder.com/150'}
+              src={profile.avatar || 'https://via.placeholder.com/150'}
               alt=""
               className="mx-auto h-24 w-24 rounded-full border-2 border-[#8e0d24] object-cover"
             />
 
-            <h2 className="mt-4 text-xl font-bold">{user.username}</h2>
-            <p className="mt-1 text-sm text-[#805861]">{user.email}</p>
+            <h2 className="mt-4 text-xl font-bold">{profile.username}</h2>
+            <p className="mt-1 text-sm text-[#805861]">{profile.email}</p>
 
             <div className="mt-4 inline-flex items-center gap-1 rounded-full border border-[#741324] bg-[#26070e] px-3 py-1 text-xs text-[#ff9aaa]">
               <FiStar />
@@ -132,7 +142,7 @@ export function ProfilePage() {
               <div>
                 <p className="text-sm text-[#b88b94]">Баланс</p>
                 <div className="mt-2 text-4xl font-extrabold">
-                  {Number(user.balance).toLocaleString('ru-RU')} ₽
+                  {Number(profile.balance).toLocaleString('ru-RU')} ₽
                 </div>
                 <p className="mt-2 text-xs text-[#805861]">Доступно для покупок</p>
               </div>
@@ -149,13 +159,13 @@ export function ProfilePage() {
           <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div className="rounded-2xl border border-[#45101a] bg-[#100305] p-5">
               <FiShoppingBag className="text-[#e5092f]" />
-              <div className="mt-4 text-2xl font-bold">{user.ordersCount}</div>
+              <div className="mt-4 text-2xl font-bold">{profile.ordersCount}</div>
               <div className="mt-1 text-sm text-[#805861]">Заказов</div>
             </div>
 
             <div className="rounded-2xl border border-[#45101a] bg-[#100305] p-5">
               <FiHeart className="text-[#e5092f]" />
-              <div className="mt-4 text-2xl font-bold">{user.favoritesCount}</div>
+              <div className="mt-4 text-2xl font-bold">{profile.favoritesCount}</div>
               <div className="mt-1 text-sm text-[#805861]">Избранных услуг</div>
             </div>
 
