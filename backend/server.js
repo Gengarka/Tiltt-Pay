@@ -352,6 +352,29 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+app.post('/api/users/:userId/deposit', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { amount } = req.body;
+    
+    const numAmount = Number(amount);
+    if (isNaN(numAmount) || numAmount < 100 || numAmount > 69000) {
+      return res.status(400).json({ error: 'Сумма должна быть от 100 до 69 000 рублей' });
+    }
+
+    const result = await pool.query(
+      'UPDATE users SET balance = balance + $1 WHERE id_user = $2 RETURNING balance',
+      [numAmount, userId]
+    );
+
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
+    res.json({ newBalance: result.rows[0].balance });
+  } catch (error) {
+    console.error('Ошибка пополнения:', error.message);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {

@@ -10,6 +10,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import OrdersPage from './pages/OrdersPage';
 import { FavoritesPage } from './pages/FavoritesPage';
 import { CheckoutPage } from './pages/CheckoutPage';
+import { PaymentPage } from './pages/PaymentPage';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/orders" element={<OrdersPage />} />
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/checkout/:id" element={<CheckoutPage />} />
+          <Route path="/payment" element={<PaymentPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

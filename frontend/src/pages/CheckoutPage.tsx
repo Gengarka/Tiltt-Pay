@@ -111,7 +111,7 @@ export function CheckoutPage() {
           </div>
         )}
 
-        {!showQR ? (
+            {!showQR ? (
           <button
             onClick={handlePay}
             disabled={isPaying}
@@ -125,15 +125,6 @@ export function CheckoutPage() {
             <h2 className="text-xl font-bold mb-2">Заказ успешно оплачен!</h2>
             <p className="text-sm text-[#805861] mb-6">Средства списаны с баланса. Продавец свяжется с вами.</p>
             
-            <div className="bg-white p-4 inline-block rounded-xl mb-4">
-              <img 
-                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Ты%20думал%20это%20честная%20оплата?%20Это%20же%20Тильт-Платеж!%20С%20тебя%20500%20баксов%20за%20рофл!" 
-                alt="Фейковый QR" 
-                className="w-32 h-32"
-              />
-            </div>
-            <p className="text-xs text-[#e5092f] mb-6">Сканируй QR-код для получения чека!</p>
-
             <Link to="/orders" className="block w-full rounded-xl bg-[#8e0d24] py-3 text-white font-bold hover:bg-[#e5092f]">
               Перейти в историю заказов
             </Link>
