@@ -178,9 +178,11 @@ export function ServicePage() {
             {service.price.toLocaleString('ru-RU')} ₽
           </div>
 
-          <Button className="mt-6 w-full">
-            Купить услугу
-          </Button>
+          <Link to={`/checkout/${service.id}`} className="block mt-6 w-full">
+            <Button className="w-full">
+              Купить услугу
+            </Button>
+          </Link>
 
           <div className="my-6 h-px bg-[#45101a]" />
 

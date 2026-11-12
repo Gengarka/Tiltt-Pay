@@ -168,6 +168,46 @@ app.get('/api/orders/user/:userId', async (req, res) => {
   }
 });
 
+app.post('/api/orders', async (req, res) => {
+  try {
+    const { userId, serviceId, price } = req.body;
+
+    if (!userId || !serviceId) {
+      return res.status(400).json({ error: 'Не хватает данных для заказа' });
+    }
+
+    const serviceResult = await pool.query('SELECT id_seller FROM services WHERE id_service = $1', [serviceId]);
+    if (serviceResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Услуга не найдена' });
+    }
+    const sellerId = serviceResult.rows[0].id_seller;
+
+    const userResult = await pool.query('SELECT balance FROM users WHERE id_user = $1', [userId]);
+    const userBalance = Number(userResult.rows[0].balance);
+
+    if (userBalance < price) {
+      return res.status(400).json({ error: 'Недостаточно средств на балансе' });
+    }
+
+    await pool.query('UPDATE users SET balance = balance - $1 WHERE id_user = $2', [price, userId]);
+
+    const newOrder = await pool.query(
+      `INSERT INTO orders (id_buyer, id_seller, id_service, id_status, price) 
+       VALUES ($1, $2, $3, 1, $4) RETURNING id_order`,
+      [userId, sellerId, serviceId, price]
+    );
+
+    res.status(201).json({ 
+      message: 'Заказ успешно создан', 
+      orderId: newOrder.rows[0].id_order 
+    });
+
+  } catch (error) {
+    console.error('Ошибка при создании заказа:', error.message);
+    res.status(500).json({ error: 'Ошибка сервера при создании заказа' });
+  }
+});
+
 app.get('/api/users/:userId/favorites', async (req, res) => {
   try {
     const { userId } = req.params;
