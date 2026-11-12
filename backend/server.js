@@ -283,21 +283,19 @@ app.post('/api/auth/register', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Введите email и пароль' });
-    }
+    if (!email || !password) return res.status(400).json({ error: 'Введите email и пароль' });
 
     const hashedPassword = hashPassword(password);
 
     const result = await pool.query(
-      'SELECT id_user AS id, username, email, balance FROM users WHERE email = $1 AND password = $2',
+      `SELECT u.id_user AS id, u.username, u.email, u.balance, r.name AS role 
+       FROM users u 
+       JOIN roles r ON r.id_role = u.id_role 
+       WHERE u.email = $1 AND u.password = $2`,
       [email, hashedPassword]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(401).json({ error: 'Неверный email или пароль' });
-    }
+    if (result.rows.length === 0) return res.status(401).json({ error: 'Неверный email или пароль' });
 
     res.json(result.rows[0]);
   } catch (error) {

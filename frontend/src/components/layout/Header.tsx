@@ -1,7 +1,10 @@
 import { FiBell, FiSearch } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext.tsx';
 
 export function Header() {
+  const { user } = useAuth(); 
+
   return (
     <header className="sticky top-0 z-40 flex min-h-16 w-full items-center border-b border-[#45101a] bg-[#100305] px-4 sm:px-6 lg:px-8">
       <div className="flex w-full items-center gap-4">
@@ -34,20 +37,26 @@ export function Header() {
             <FiBell />
           </button>
 
-          <Link
-            to="/login"
-            className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition hover:bg-[#26070e]"
-          >
-            <img
-              src="https://i.pravatar.cc/80?img=47"
-              alt=""
-              className="h-9 w-9 rounded-full border border-[#e5092f]"
-            />
-
-            <span className="hidden text-sm text-white sm:inline">
-              Nika
-            </span>
-          </Link>
+          {user ? (
+            <Link
+              to="/profile"
+              className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition hover:bg-[#26070e]"
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e5092f] bg-[#26070e] text-sm font-bold text-white">
+                {user.username[0].toUpperCase()}
+              </div>
+              <span className="hidden text-sm text-white sm:inline">
+                {user.username}
+              </span>
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className="rounded-xl bg-[#8e0d24] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#e5092f]"
+            >
+              Войти
+            </Link>
+          )}
         </div>
       </div>
     </header>
