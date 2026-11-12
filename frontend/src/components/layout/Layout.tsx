@@ -5,13 +5,15 @@ import {
   FiHome,
   FiSettings,
   FiShoppingBag,
+  FiShield, 
 } from 'react-icons/fi';
 import { NavLink, Outlet } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext'; 
 
 import { Header } from './Header';
 import { Footer } from './Footer';
 
-const navigationItems = [
+const baseNavigationItems = [
   {
     to: '/',
     label: 'Главная',
@@ -23,17 +25,17 @@ const navigationItems = [
     icon: FiGrid,
   },
   {
-    to: '/login',
+    to: '/orders', 
     label: 'Мои покупки',
     icon: FiShoppingBag,
   },
   {
-    to: '/login',
+    to: '/favorites', 
     label: 'Избранное',
     icon: FiHeart,
   },
   {
-    to: '/login',
+    to: '/login', 
     label: 'Кошелёк',
     icon: FiShoppingBag,
   },
@@ -50,6 +52,8 @@ const navigationItems = [
 ];
 
 export function Layout() {
+  const { user } = useAuth(); 
+
   return (
     <div className="flex min-h-screen flex-col bg-[#080304] text-white">
       <Header />
@@ -57,7 +61,7 @@ export function Layout() {
       <div className="flex flex-1">
         <aside className="hidden w-64 shrink-0 border-r border-[#45101a] bg-[#100305] p-4 lg:block">
           <nav className="space-y-1">
-            {navigationItems.map((item) => {
+            {baseNavigationItems.map((item) => {
               const Icon = item.icon;
 
               return (
@@ -77,6 +81,22 @@ export function Layout() {
                 </NavLink>
               );
             })}
+
+            {user?.role === 'admin' && (
+              <NavLink
+                to="/admin"
+                className={({ isActive }) =>
+                  `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
+                    isActive
+                      ? 'bg-[#e5092f] text-white' 
+                      : 'text-[#ff9aaa] hover:bg-[#26070e] hover:text-white'
+                  }`
+                }
+              >
+                <FiShield />
+                <span>Админ-панель</span>
+              </NavLink>
+            )}
           </nav>
 
           <div className="mt-8 rounded-2xl border border-[#5c101e] bg-[#18050a] p-4">
