@@ -12,6 +12,7 @@ import { FavoritesPage } from './pages/FavoritesPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { PaymentPage } from './pages/PaymentPage';
 import { WalletPage } from './pages/WalletPage';
+import { SettingsPage } from './pages/SettingPage';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/checkout/:id" element={<CheckoutPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

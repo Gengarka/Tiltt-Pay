@@ -294,6 +294,48 @@ app.get('/api/users/:userId/profile', async (req, res) => {
   }
 });
 
+app.put('/api/users/:userId/profile', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { username, email, newPassword } = req.body;
+
+    if (!username || !email) {
+      return res.status(400).json({ error: 'Имя и email обязательны' });
+    }
+
+    let query = 'UPDATE users SET username = $1, email = $2';
+    let values = [username, email];
+
+    if (newPassword && newPassword.trim() !== '') {
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: 'Пароль должен быть не менее 6 символов' });
+      }
+      const hashedPassword = hashPassword(newPassword);
+      query += ', password = $3 WHERE id_user = $4';
+      values.push(hashedPassword, userId);
+    } else {
+      query += ' WHERE id_user = $3';
+      values.push(userId);
+    }
+
+    query += ' RETURNING id_user AS id, username, email, balance, (SELECT name FROM roles WHERE id_role = users.id_role) AS role';
+
+    const result = await pool.query(query, values);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    if (error.code === '23505') {
+       return res.status(400).json({ error: 'Этот email уже занят другим пользователем' });
+    }
+    console.error('Ошибка обновления профиля:', error.message);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 
 function hashPassword(password) {
   return crypto.createHash('sha256').update(password).digest('hex');

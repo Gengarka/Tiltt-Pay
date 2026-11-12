@@ -45,7 +45,7 @@ const baseNavigationItems = [
     icon: FiHelpCircle,
   },
   {
-    to: '/login',
+    to: '/settings',
     label: 'Настройки',
     icon: FiSettings,
   },
