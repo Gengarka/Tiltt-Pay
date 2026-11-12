@@ -42,9 +42,17 @@ export function Header() {
               to="/profile"
               className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition hover:bg-[#26070e]"
             >
+              {user.avatar ? (
+               <img 
+                 src={user.avatar} 
+                 alt="Аватар" 
+                  className="h-9 w-9 rounded-full border border-[#e5092f] object-cover" 
+               />
+           ) : (
               <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e5092f] bg-[#26070e] text-sm font-bold text-white">
-                {user.username[0].toUpperCase()}
-              </div>
+               {user.username[0].toUpperCase()}
+                </div>
+              )}
               <span className="hidden text-sm text-white sm:inline">
                 {user.username}
               </span>

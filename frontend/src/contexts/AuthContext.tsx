@@ -7,6 +7,8 @@ interface User {
   email: string;
   balance: number;
   role: string;
+  avatar?: string | null;
+  bio?: string | null;
 }
 
 interface AuthContextType {

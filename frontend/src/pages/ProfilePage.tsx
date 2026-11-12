@@ -82,7 +82,7 @@ export function ProfilePage() {
           <div className="text-center">
             <img
               src={profile.avatar || 'https://via.placeholder.com/150'}
-              alt=""
+              alt="Аватар"
               className="mx-auto h-24 w-24 rounded-full border-2 border-[#8e0d24] object-cover"
             />
 

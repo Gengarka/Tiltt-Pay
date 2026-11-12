@@ -297,28 +297,28 @@ app.get('/api/users/:userId/profile', async (req, res) => {
 app.put('/api/users/:userId/profile', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { username, email, newPassword } = req.body;
+    const { username, email, newPassword, bio, avatar } = req.body;
 
     if (!username || !email) {
       return res.status(400).json({ error: 'Имя и email обязательны' });
     }
 
-    let query = 'UPDATE users SET username = $1, email = $2';
-    let values = [username, email];
+    let query = 'UPDATE users SET username = $1, email = $2, bio = $3, avatar_path = $4';
+    let values = [username, email, bio || null, avatar || null];
 
     if (newPassword && newPassword.trim() !== '') {
       if (newPassword.length < 6) {
         return res.status(400).json({ error: 'Пароль должен быть не менее 6 символов' });
       }
       const hashedPassword = hashPassword(newPassword);
-      query += ', password = $3 WHERE id_user = $4';
+      query += ', password = $5 WHERE id_user = $6';
       values.push(hashedPassword, userId);
     } else {
-      query += ' WHERE id_user = $3';
+      query += ' WHERE id_user = $5';
       values.push(userId);
     }
 
-    query += ' RETURNING id_user AS id, username, email, balance, (SELECT name FROM roles WHERE id_role = users.id_role) AS role';
+    query += ' RETURNING id_user AS id, username, email, balance, avatar_path AS avatar, bio, (SELECT name FROM roles WHERE id_role = users.id_role) AS role';
 
     const result = await pool.query(query, values);
 
@@ -329,7 +329,7 @@ app.put('/api/users/:userId/profile', async (req, res) => {
     res.json(result.rows[0]);
   } catch (error) {
     if (error.code === '23505') {
-       return res.status(400).json({ error: 'Этот email уже занят другим пользователем' });
+       return res.status(400).json({ error: 'Этот email уже занят' });
     }
     console.error('Ошибка обновления профиля:', error.message);
     res.status(500).json({ error: 'Ошибка сервера' });
@@ -384,7 +384,7 @@ app.post('/api/auth/login', async (req, res) => {
     const hashedPassword = hashPassword(password);
 
     const result = await pool.query(
-      `SELECT u.id_user AS id, u.username, u.email, u.balance, r.name AS role 
+      `SELECT u.id_user AS id, u.username, u.email, u.balance, u.avatar_path AS avatar, u.bio, r.name AS role 
        FROM users u 
        JOIN roles r ON r.id_role = u.id_role 
        WHERE u.email = $1 AND u.password = $2`,
