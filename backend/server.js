@@ -196,10 +196,18 @@ app.post('/api/orders', async (req, res) => {
        VALUES ($1, $2, $3, 1, $4) RETURNING id_order`,
       [userId, sellerId, serviceId, price]
     );
+    
+    const orderId = newOrder.rows[0].id_order;
+
+    await pool.query(
+      `INSERT INTO payments (id_order, id_user, amount, id_payment_method, status) 
+       VALUES ($1, $2, $3, 2, 'paid')`, 
+      [orderId, userId, price] 
+    );
 
     res.status(201).json({ 
       message: 'Заказ успешно создан', 
-      orderId: newOrder.rows[0].id_order 
+      orderId: orderId 
     });
 
   } catch (error) {
@@ -368,9 +376,38 @@ app.post('/api/users/:userId/deposit', async (req, res) => {
     );
 
     if (result.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
+
+    await pool.query(
+      `INSERT INTO payments (id_user, amount, id_payment_method, status) 
+       VALUES ($1, $2, 1, 'paid')`,
+      [userId, numAmount]
+    );
+
     res.json({ newBalance: result.rows[0].balance });
   } catch (error) {
     console.error('Ошибка пополнения:', error.message);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+app.get('/api/users/:userId/payments', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await pool.query(
+      `SELECT 
+        p.id_payment AS id, p.amount, p.payment_date AS date, p.status,
+        pm.name AS payment_method, s.title AS service_title
+       FROM payments p
+       LEFT JOIN orders o ON o.id_order = p.id_order
+       LEFT JOIN services s ON s.id_service = o.id_service
+       LEFT JOIN payment_methods pm ON pm.id_payment_method = p.id_payment_method
+       WHERE p.id_user = $1
+       ORDER BY p.payment_date DESC`,
+      [userId]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Ошибка сервера' });
   }
 });

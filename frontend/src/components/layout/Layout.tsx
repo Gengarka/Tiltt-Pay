@@ -35,7 +35,7 @@ const baseNavigationItems = [
     icon: FiHeart,
   },
   {
-    to: '/login', 
+    to: '/wallet', 
     label: 'Кошелёк',
     icon: FiShoppingBag,
   },
