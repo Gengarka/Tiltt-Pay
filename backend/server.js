@@ -265,11 +265,14 @@ app.post('/api/auth/register', async (req, res) => {
     }
 
     const hashedPassword = hashPassword(password);
+    
     const roleId = 3; 
 
     const newUser = await pool.query(
       `INSERT INTO users (id_role, login, password, email, username, balance) 
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id_user AS id, username, email, balance`,
+       VALUES ($1, $2, $3, $4, $5, $6) 
+       RETURNING id_user AS id, username, email, balance, 
+       (SELECT name FROM roles WHERE id_role = $1) AS role`,
       [roleId, email, hashedPassword, email, username, 0]
     );
 
@@ -283,7 +286,10 @@ app.post('/api/auth/register', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ error: 'Введите email и пароль' });
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Введите email и пароль' });
+    }
 
     const hashedPassword = hashPassword(password);
 
@@ -295,7 +301,9 @@ app.post('/api/auth/login', async (req, res) => {
       [email, hashedPassword]
     );
 
-    if (result.rows.length === 0) return res.status(401).json({ error: 'Неверный email или пароль' });
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Неверный email или пароль' });
+    }
 
     res.json(result.rows[0]);
   } catch (error) {

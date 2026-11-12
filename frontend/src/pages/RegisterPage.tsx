@@ -1,46 +1,27 @@
 import { useState } from 'react';
-import {
-  FiCheck,
-  FiEye,
-  FiEyeOff,
-  FiLock,
-  FiMail,
-  FiUser,
-} from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiLock, FiMail, FiUser } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+
+const API_URL = 'http://localhost:3001/api';
 
 export function RegisterPage() {
   const navigate = useNavigate();
+  const { login } = useAuth(); 
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [repeatPassword, setRepeatPassword] = useState('');
-
   const [showPassword, setShowPassword] = useState(false);
-  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
-
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     setError('');
 
-    if (
-      !username.trim() ||
-      !email.trim() ||
-      !password.trim() ||
-      !repeatPassword.trim()
-    ) {
+    if (!username.trim() || !email.trim() || !password.trim()) {
       setError('Заполни все поля');
-      return;
-    }
-
-    if (username.trim().length < 3) {
-      setError('Имя пользователя должно содержать минимум 3 символа');
       return;
     }
 
@@ -50,16 +31,35 @@ export function RegisterPage() {
     }
 
     if (password.length < 6) {
-      setError('Пароль должен содержать минимум 6 символов');
+      setError('Пароль должен быть не менее 6 символов');
       return;
     }
 
-    if (password !== repeatPassword) {
-      setError('Пароли не совпадают');
-      return;
-    }
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password }),
+      });
 
-    navigate('/profile');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Ошибка при регистрации');
+      }
+
+      login(data); 
+      navigate('/profile'); 
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Что-то пошло не так');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -69,64 +69,43 @@ export function RegisterPage() {
           <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#8e0d24] text-xl font-extrabold text-white shadow-lg shadow-[#8e0d24]/20">
             Т
           </div>
-
-          <h1 className="text-3xl font-extrabold tracking-tight">
-            Создать аккаунт
-          </h1>
-
-          <p className="mt-2 text-sm text-[#805861]">
-            Зарегистрируйся и начинай пользоваться Тильт-платёж
-          </p>
+          <h1 className="text-3xl font-extrabold tracking-tight">Создание аккаунта</h1>
+          <p className="mt-2 text-sm text-[#805861]">Присоединяйся к Тильт-платеж</p>
         </div>
 
         <form
           onSubmit={handleSubmit}
           className="rounded-3xl border border-[#45101a] bg-[#100305] p-6 shadow-2xl shadow-black/20 sm:p-8"
         >
-          <div className="space-y-5">
-            {/* Имя */}
+          <div className="space-y-4">
             <div>
-              <label
-                htmlFor="username"
-                className="mb-2 block text-sm font-medium text-[#d9aeb6]"
-              >
+              <label htmlFor="username" className="mb-2 block text-sm font-medium text-[#d9aeb6]">
                 Имя пользователя
               </label>
-
               <div className="relative">
                 <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-[#805861]" />
-
                 <input
                   id="username"
                   type="text"
                   value={username}
-                  onChange={(event) =>
-                    setUsername(event.target.value)
-                  }
-                  placeholder="Например, PlayerOne"
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Твой никнейм"
                   className="h-12 w-full rounded-xl border border-[#45101a] bg-[#18050a] pl-11 pr-4 text-sm text-white outline-none placeholder:text-[#69434b] transition focus:border-[#e5092f]"
                 />
               </div>
             </div>
 
             <div>
-              <label
-                htmlFor="register-email"
-                className="mb-2 block text-sm font-medium text-[#d9aeb6]"
-              >
+              <label htmlFor="email" className="mb-2 block text-sm font-medium text-[#d9aeb6]">
                 Email
               </label>
-
               <div className="relative">
                 <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#805861]" />
-
                 <input
-                  id="register-email"
+                  id="email"
                   type="email"
                   value={email}
-                  onChange={(event) =>
-                    setEmail(event.target.value)
-                  }
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="example@mail.ru"
                   className="h-12 w-full rounded-xl border border-[#45101a] bg-[#18050a] pl-11 pr-4 text-sm text-white outline-none placeholder:text-[#69434b] transition focus:border-[#e5092f]"
                 />
@@ -134,81 +113,25 @@ export function RegisterPage() {
             </div>
 
             <div>
-              <label
-                htmlFor="register-password"
-                className="mb-2 block text-sm font-medium text-[#d9aeb6]"
-              >
+              <label htmlFor="password" className="mb-2 block text-sm font-medium text-[#d9aeb6]">
                 Пароль
               </label>
-
               <div className="relative">
                 <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#805861]" />
-
                 <input
-                  id="register-password"
+                  id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
-                  onChange={(event) =>
-                    setPassword(event.target.value)
-                  }
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Минимум 6 символов"
                   className="h-12 w-full rounded-xl border border-[#45101a] bg-[#18050a] pl-11 pr-12 text-sm text-white outline-none placeholder:text-[#69434b] transition focus:border-[#e5092f]"
                 />
-
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowPassword((value) => !value)
-                  }
+                  onClick={() => setShowPassword((v) => !v)}
                   className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-[#805861] transition hover:bg-[#26070e] hover:text-white"
-                  aria-label={
-                    showPassword
-                      ? 'Скрыть пароль'
-                      : 'Показать пароль'
-                  }
                 >
                   {showPassword ? <FiEyeOff /> : <FiEye />}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="repeat-password"
-                className="mb-2 block text-sm font-medium text-[#d9aeb6]"
-              >
-                Повтори пароль
-              </label>
-
-              <div className="relative">
-                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#805861]" />
-
-                <input
-                  id="repeat-password"
-                  type={
-                    showRepeatPassword ? 'text' : 'password'
-                  }
-                  value={repeatPassword}
-                  onChange={(event) =>
-                    setRepeatPassword(event.target.value)
-                  }
-                  placeholder="Повтори пароль"
-                  className="h-12 w-full rounded-xl border border-[#45101a] bg-[#18050a] pl-11 pr-12 text-sm text-white outline-none placeholder:text-[#69434b] transition focus:border-[#e5092f]"
-                />
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    setShowRepeatPassword((value) => !value)
-                  }
-                  className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-[#805861] transition hover:bg-[#26070e] hover:text-white"
-                  aria-label={
-                    showRepeatPassword
-                      ? 'Скрыть пароль'
-                      : 'Показать пароль'
-                  }
-                >
-                  {showRepeatPassword ? <FiEyeOff /> : <FiEye />}
                 </button>
               </div>
             </div>
@@ -220,27 +143,23 @@ export function RegisterPage() {
             </div>
           )}
 
-          <div className="mt-5 flex items-start gap-3 text-xs leading-5 text-[#805861]">
-            <FiCheck className="mt-0.5 shrink-0 text-[#e5092f]" />
-
-            <span>
-              Создавая аккаунт, ты соглашаешься с правилами использования сервиса.
-            </span>
-          </div>
-
           <button
             type="submit"
-            className="mt-6 h-12 w-full rounded-xl bg-[#8e0d24] text-sm font-bold text-white transition hover:bg-[#e5092f]"
+            disabled={loading}
+            className="mt-6 h-12 w-full rounded-xl bg-[#8e0d24] text-sm font-bold text-white transition hover:bg-[#e5092f] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Создать аккаунт
+            {loading ? 'Регистрация...' : 'Зарегистрироваться'}
           </button>
 
-          <p className="mt-6 text-center text-sm text-[#805861]">
+          <div className="my-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-[#45101a]" />
+            <span className="text-xs text-[#69434b]">или</span>
+            <div className="h-px flex-1 bg-[#45101a]" />
+          </div>
+
+          <p className="text-center text-sm text-[#805861]">
             Уже есть аккаунт?{' '}
-            <Link
-              to="/login"
-              className="font-semibold text-[#ff7186] transition hover:text-white"
-            >
+            <Link to="/login" className="font-semibold text-[#ff7186] transition hover:text-white">
               Войти
             </Link>
           </p>
