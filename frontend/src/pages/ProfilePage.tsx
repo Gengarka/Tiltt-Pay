@@ -171,7 +171,7 @@ export function ProfilePage() {
 
             <div className="rounded-2xl border border-[#45101a] bg-[#100305] p-5">
               <FiStar className="text-[#e5092f]" />
-              <div className="mt-4 text-2xl font-bold">4.9</div>
+              <div className="mt-4 text-2xl font-bold">{profile.ordersCount > 0 ? '4.9' : '0'}</div>
               <div className="mt-1 text-sm text-[#805861]">Средняя оценка</div>
             </div>
           </section>
@@ -191,32 +191,22 @@ export function ProfilePage() {
               </Link>
             </div>
 
-            <div className="divide-y divide-[#45101a]">
-              <div className="flex items-center justify-between gap-4 px-6 py-5">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#26070e] text-[#e5092f]">
-                    <FiPackage />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold">Поднятие рейтинга в Dota 2</div>
-                    <div className="mt-1 text-xs text-[#805861]">Заказ #1048 · Сегодня</div>
-                  </div>
+                        <div className="divide-y divide-[#45101a]">
+              {profile.ordersCount > 0 ? (
+                <div className="p-6 text-center text-sm text-[#805861]">
+                  У вас есть заказы, они отображаются в разделе "История заказов"
                 </div>
-                <span className="hidden text-sm font-semibold sm:block">799 ₽</span>
-              </div>
-
-              <div className="flex items-center justify-between gap-4 px-6 py-5">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#26070e] text-[#e5092f]">
-                    <FiPackage />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold">Помощь с Premier в CS2</div>
-                    <div className="mt-1 text-xs text-[#805861]">Заказ #1042 · Вчера</div>
-                  </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center p-8 text-center">
+                  <FiPackage className="text-3xl text-[#45101a] mb-3" />
+                  <p className="text-sm text-[#805861]">
+                    У вас пока нет заказов. <br /> 
+                    <Link to="/catalog" className="text-[#ff7186] hover:text-white mt-2 inline-block">
+                      Перейти в каталог
+                    </Link>
+                  </p>
                 </div>
-                <span className="hidden text-sm font-semibold sm:block">599 ₽</span>
-              </div>
+              )}
             </div>
           </section>
         </main>
