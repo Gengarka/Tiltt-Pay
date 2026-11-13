@@ -36,6 +36,7 @@ function App() {
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/my-services" element={<MyServicesPage />} />
           <Route path="/my-services/new" element={<ServiceFormPage />} />
+          <Route path="/my-services/edit/:id" element={<ServiceFormPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

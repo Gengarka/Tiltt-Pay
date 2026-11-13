@@ -35,6 +35,25 @@ export function MyServicesPage() {
     fetchMyServices();
   }, [user, authLoading, navigate]);
 
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('Вы уверены, что хотите удалить эту услугу?')) return;
+
+    try {
+      const res = await fetch(`${API_URL}/services/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setServices((prev) => prev.filter((service) => service.id !== id));
+      } else {
+        alert('Не удалось удалить услугу');
+      }
+    } catch (error) {
+      console.error('Ошибка удаления:', error);
+      alert('Ошибка сервера при удалении');
+    }
+  };
+
   if (authLoading || loading) return <div className="py-20 text-center text-[#805861]">Загрузка...</div>;
 
   return (
@@ -76,11 +95,21 @@ export function MyServicesPage() {
                   </span>
                 </div>
               </div>
+              
               <div className="flex gap-2">
-                <button className="p-3 rounded-xl border border-[#45101a] text-[#b88b94] hover:bg-[#26070e] transition">
+                <Link 
+                  to={`/my-services/edit/${service.id}`} 
+                  className="p-3 rounded-xl border border-[#45101a] text-[#b88b94] hover:bg-[#26070e] transition"
+                  title="Редактировать"
+                >
                   <FiEdit />
-                </button>
-                <button className="p-3 rounded-xl border border-[#45101a] text-[#ff7186] hover:bg-[#2a0710] transition">
+                </Link>
+                
+                <button 
+                  onClick={() => handleDelete(service.id)}
+                  className="p-3 rounded-xl border border-[#45101a] text-[#ff7186] hover:bg-[#2a0710] transition"
+                  title="Удалить"
+                >
                   <FiTrash2 />
                 </button>
               </div>
