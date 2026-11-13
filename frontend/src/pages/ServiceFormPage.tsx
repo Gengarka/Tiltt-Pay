@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { FiArrowLeft, FiSave } from 'react-icons/fi';
-import { Link, useNavigate } from 'react-router-dom';
+import { FiArrowLeft, FiSave, FiImage } from 'react-icons/fi';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -8,6 +8,9 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 export function ServiceFormPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  
+  const { id } = useParams(); 
+  const isEditing = Boolean(id);
 
   const [games, setGames] = useState<any[]>([]);
   const [title, setTitle] = useState('');
@@ -15,6 +18,7 @@ export function ServiceFormPage() {
   const [price, setPrice] = useState('');
   const [category, setCategory] = useState('Обучение');
   const [description, setDescription] = useState('');
+  const [image, setImage] = useState(''); 
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -26,37 +30,78 @@ export function ServiceFormPage() {
       .then(res => res.json())
       .then(data => {
         setGames(data);
-        if (data.length > 0) setGameName(data[0].name);
+        if (!isEditing && data.length > 0) setGameName(data[0].name);
       });
-  }, [user, navigate]);
+  }, [user, navigate, isEditing]);
+
+  useEffect(() => {
+    if (isEditing && id) {
+      fetch(`${API_URL}/services/${id}`)
+        .then(res => res.json())
+        .then(data => {
+          setTitle(data.title);
+          setGameName(data.gameName || '');
+          setPrice(data.price.toString());
+          setCategory(data.category);
+          setDescription(data.description);
+          setImage(data.image || '');
+        })
+        .catch(err => console.error('Ошибка загрузки:', err));
+    }
+  }, [isEditing, id]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Картинка слишком большая (макс. 2 МБ)');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImage(reader.result as string); 
+      setError('');
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!title || !price || !description) {
+    if (!title || !price || !description || !gameName) {
       setError('Заполните все обязательные поля');
       return;
     }
 
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/services`, {
-        method: 'POST',
+      
+      const url = isEditing ? `${API_URL}/services/${id}` : `${API_URL}/services`;
+      const method = isEditing ? 'PUT' : 'POST';
+
+      const bodyData: any = {
+        title,
+        description,
+        price: Number(price),
+        category,
+        gameName,
+        image 
+      };
+
+      if (!isEditing) bodyData.sellerId = user?.id;
+
+      const res = await fetch(url, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sellerId: user?.id,
-          title,
-          description,
-          price: Number(price),
-          category,
-          gameName
-        }),
+        body: JSON.stringify(bodyData),
       });
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.error || 'Ошибка при создании');
+      if (!res.ok) throw new Error(data.error || 'Ошибка при сохранении');
 
       navigate('/my-services'); 
     } catch (err: any) {
@@ -73,11 +118,35 @@ export function ServiceFormPage() {
       </Link>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-extrabold tracking-tight">Новая услуга</h1>
-        <p className="mt-2 text-sm text-[#805861]">Заполните информацию о товаре, который вы хотите продать.</p>
+        <h1 className="text-3xl font-extrabold tracking-tight">
+          {isEditing ? 'Редактирование услуги' : 'Новая услуга'}
+        </h1>
       </div>
 
       <form onSubmit={handleSubmit} className="rounded-3xl border border-[#45101a] bg-[#100305] p-6 sm:p-8 space-y-5">
+        
+        {/* Поле для картинки */}
+        <div className="flex items-center gap-6 mb-4">
+          <div className="w-32 h-32 rounded-xl border border-dashed border-[#45101a] bg-[#18050a] flex items-center justify-center overflow-hidden relative group">
+            {image ? (
+              <img src={image} alt="Превью" className="w-full h-full object-cover" />
+            ) : (
+              <FiImage className="text-4xl text-[#45101a]" />
+            )}
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handleImageChange} 
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              title="Загрузить фото"
+            />
+          </div>
+          <div>
+            <h3 className="font-medium text-[#d9aeb6]">Обложка услуги</h3>
+            <p className="text-xs text-[#805861] mt-1">Нажмите на квадрат, чтобы выбрать картинку (до 2 МБ)</p>
+          </div>
+        </div>
+
         <div>
           <label className="block text-sm font-medium text-[#d9aeb6] mb-2">Название услуги *</label>
           <input type="text" value={title} onChange={e => setTitle(e.target.value)} 
@@ -89,6 +158,7 @@ export function ServiceFormPage() {
             <label className="block text-sm font-medium text-[#d9aeb6] mb-2">Игра *</label>
             <select value={gameName} onChange={e => setGameName(e.target.value)}
               className="h-12 w-full rounded-xl border border-[#45101a] bg-[#18050a] px-4 text-white outline-none focus:border-[#e5092f]">
+              <option value="" disabled>Выберите игру</option>
               {games.map(g => <option key={g.id} value={g.name}>{g.name}</option>)}
             </select>
           </div>
@@ -120,7 +190,7 @@ export function ServiceFormPage() {
 
         <button type="submit" disabled={loading}
           className="mt-4 w-full flex items-center justify-center gap-2 rounded-xl bg-[#8e0d24] py-4 text-sm font-bold text-white transition hover:bg-[#e5092f] disabled:opacity-50">
-          <FiSave /> {loading ? 'Публикация...' : 'Опубликовать услугу'}
+          <FiSave /> {loading ? 'Сохранение...' : (isEditing ? 'Сохранить изменения' : 'Опубликовать услугу')}
         </button>
       </form>
     </div>

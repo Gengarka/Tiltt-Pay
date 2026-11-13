@@ -1,17 +1,23 @@
-import { FiBell, FiSearch } from 'react-icons/fi';
+import { FiBell, FiMenu, FiSearch } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext.tsx';
+import { useAuth } from '../../contexts/AuthContext';
 
-export function Header() {
-  const { user } = useAuth(); 
+export function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
+  const { user } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 flex min-h-16 w-full items-center border-b border-[#45101a] bg-[#100305] px-4 sm:px-6 lg:px-8">
       <div className="flex w-full items-center gap-4">
-        <Link
-          to="/"
-          className="shrink-0 text-lg font-extrabold tracking-tight"
+        
+        <button
+          onClick={toggleSidebar}
+          className="lg:hidden p-2 -ml-2 text-[#d9aeb6] hover:text-white"
+          aria-label="Открыть меню"
         >
+          <FiMenu size={24} />
+        </button>
+
+        <Link to="/" className="shrink-0 text-lg font-extrabold tracking-tight">
           <span className="text-white">Тильт-</span>
           <span className="text-[#e5092f]">платёж</span>
         </Link>
@@ -19,7 +25,6 @@ export function Header() {
         <div className="flex min-w-0 flex-1 justify-center px-2 sm:px-6">
           <div className="relative w-full max-w-2xl">
             <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8d5b64]" />
-
             <input
               type="text"
               placeholder="Поиск по играм, услугам, товарам..."
@@ -43,14 +48,14 @@ export function Header() {
               className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition hover:bg-[#26070e]"
             >
               {user.avatar ? (
-               <img 
-                 src={user.avatar} 
-                 alt="Аватар" 
+                <img 
+                  src={user.avatar} 
+                  alt="Аватар" 
                   className="h-9 w-9 rounded-full border border-[#e5092f] object-cover" 
-               />
-           ) : (
-              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e5092f] bg-[#26070e] text-sm font-bold text-white">
-               {user.username[0].toUpperCase()}
+                />
+              ) : (
+                <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e5092f] bg-[#26070e] text-sm font-bold text-white">
+                  {user.username[0].toUpperCase()}
                 </div>
               )}
               <span className="hidden text-sm text-white sm:inline">
