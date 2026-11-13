@@ -287,6 +287,33 @@ app.post('/api/services', async (req, res) => {
   }
 });
 
+app.put('/api/services/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, price, category, gameName, image } = req.body;
+
+    const gameResult = await pool.query('SELECT id_game FROM games WHERE name = $1', [gameName]);
+    if (gameResult.rows.length === 0) return res.status(400).json({ error: 'Игра не найдена' });
+    const gameId = gameResult.rows[0].id_game;
+
+    const result = await pool.query(
+      `UPDATE services 
+       SET title = $1, description = $2, price = $3, category = $4, id_game = $5, image_url = $6 
+       WHERE id_service = $7 RETURNING id_service`,
+      [title, description, price, category, gameId, image || null, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Услуга не найдена' });
+    }
+
+    res.json({ message: 'Услуга успешно обновлена' });
+  } catch (error) {
+    console.error('Ошибка обновления услуги:', error.message);
+    res.status(500).json({ error: 'Ошибка сервера при обновлении' });
+  }
+});
+
 app.delete('/api/services/:id', async (req, res) => {
   try {
     const { id } = req.params;
