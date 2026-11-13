@@ -25,6 +25,11 @@ const baseNavigationItems = [
     icon: FiGrid,
   },
   {
+    to: '/my-services',
+    label: 'Мои услуги',
+    icon: FiShoppingBag, 
+  },
+  {
     to: '/orders', 
     label: 'Мои покупки',
     icon: FiShoppingBag,

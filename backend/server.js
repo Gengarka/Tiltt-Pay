@@ -454,6 +454,56 @@ app.get('/api/users/:userId/payments', async (req, res) => {
   }
 });
 
+app.get('/api/services/my/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const query = `
+      SELECT 
+        s.id_service AS id, s.title, s.description, s.price, s.category, s.status,
+        g.name AS "gameName"
+      FROM services s
+      LEFT JOIN games g ON g.id_game = s.id_game
+      WHERE s.id_seller = $1
+      ORDER BY s.id_service DESC
+    `;
+    const result = await pool.query(query, [userId]);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Ошибка загрузки моих услуг:', error.message);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+app.post('/api/services', async (req, res) => {
+  try {
+    const { sellerId, title, description, price, category, gameName } = req.body;
+
+    if (!sellerId || !title || !price || !gameName) {
+      return res.status(400).json({ error: 'Заполните обязательные поля' });
+    }
+
+    const gameResult = await pool.query('SELECT id_game FROM games WHERE name = $1', [gameName]);
+    if (gameResult.rows.length === 0) {
+      return res.status(400).json({ error: 'Такая игра не найдена' });
+    }
+    const gameId = gameResult.rows[0].id_game;
+
+    const newService = await pool.query(
+      `INSERT INTO services (id_seller, id_game, title, description, price, category, status) 
+       VALUES ($1, $2, $3, $4, $5, $6, 'active') RETURNING id_service`,
+      [sellerId, gameId, title, description, price, category || 'Другое']
+    );
+
+    res.status(201).json({ 
+      message: 'Услуга создана', 
+      serviceId: newService.rows[0].id_service 
+    });
+  } catch (error) {
+    console.error('Ошибка создания услуги:', error.message);
+    res.status(500).json({ error: 'Ошибка сервера при создании услуги' });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {

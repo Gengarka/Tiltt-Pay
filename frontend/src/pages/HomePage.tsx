@@ -84,9 +84,11 @@ export function HomePage() {
               </Button>
             </Link>
 
-            <Button variant="secondary">
-              Стать продавцом
-            </Button>
+            <Link to="/my-services/new">
+              <Button variant="secondary">
+                 Стать продавцом
+              </Button>
+            </Link>
           </div>
         </div>
 

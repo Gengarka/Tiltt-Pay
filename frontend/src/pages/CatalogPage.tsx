@@ -47,9 +47,7 @@ export function CatalogPage() {
         setLoading(true);
         setError('');
 
-        const response = await fetch(API_URL, {
-          signal: controller.signal,
-        });
+        const response = await fetch(`${API_URL}/services`);
 
         if (!response.ok) {
           throw new Error(`Ошибка сервера: ${response.status}`);
