@@ -15,6 +15,8 @@ import { WalletPage } from './pages/WalletPage';
 import { SettingsPage } from './pages/SettingPage';
 import { MyServicesPage } from './pages/MyServicePage';
 import { ServiceFormPage } from './pages/ServiceFormPage';
+import { AdminPage } from './pages/AdminPage';
+
 
 
 function App() {
@@ -37,6 +39,7 @@ function App() {
           <Route path="/my-services" element={<MyServicesPage />} />
           <Route path="/my-services/new" element={<ServiceFormPage />} />
           <Route path="/my-services/edit/:id" element={<ServiceFormPage />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

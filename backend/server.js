@@ -399,6 +399,93 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
+app.get('/api/admin/users', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT u.id_user AS id, u.username, u.email, u.balance, r.name AS role 
+       FROM users u 
+       JOIN roles r ON r.id_role = u.id_role 
+       ORDER BY u.id_user`
+    );
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Ошибка загрузки пользователей' });
+  }
+});
+
+app.get('/api/admin/services', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT s.id_service AS id, s.title, s.price, s.status, u.username AS "sellerName"
+       FROM services s
+       JOIN users u ON u.id_user = s.id_seller
+       ORDER BY s.id_service DESC`
+    );
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Ошибка загрузки услуг' });
+  }
+});
+
+app.delete('/api/admin/services/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await pool.query(
+      `DELETE FROM reviews WHERE id_order IN (SELECT id_order FROM orders WHERE id_service = $1)`, 
+      [id]
+    );
+
+    await pool.query(
+      `DELETE FROM payments WHERE id_order IN (SELECT id_order FROM orders WHERE id_service = $1)`, 
+      [id]
+    );
+
+    await pool.query(
+      `DELETE FROM order_status_history WHERE id_order IN (SELECT id_order FROM orders WHERE id_service = $1)`, 
+      [id]
+    );
+
+    await pool.query(
+      `DELETE FROM messages WHERE id_order IN (SELECT id_order FROM orders WHERE id_service = $1)`, 
+      [id]
+    );
+
+    await pool.query('DELETE FROM orders WHERE id_service = $1', [id]);
+
+    await pool.query('DELETE FROM favorites WHERE id_service = $1', [id]);
+
+    await pool.query('DELETE FROM services WHERE id_service = $1', [id]);
+
+    res.json({ message: 'Услуга и все связанные данные удалены' });
+  } catch (error) {
+    console.error('Ошибка удаления админом:', error.message);
+    res.status(500).json({ error: 'Ошибка удаления' });
+  }
+});
+
+app.put('/api/admin/users/:userId/balance', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { amount } = req.body; 
+
+    if (!amount || isNaN(amount)) {
+      return res.status(400).json({ error: 'Некорректная сумма' });
+    }
+
+    const result = await pool.query(
+      'UPDATE users SET balance = balance + $1 WHERE id_user = $2 RETURNING balance',
+      [amount, userId]
+    );
+
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
+
+    res.json({ newBalance: result.rows[0].balance });
+  } catch (error) {
+    res.status(500).json({ error: 'Ошибка изменения баланса' });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
