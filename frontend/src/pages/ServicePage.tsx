@@ -6,9 +6,10 @@ import {
   FiShield,
   FiStar,
 } from 'react-icons/fi';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom'; 
 
 import { Button } from '../components/ui/Button';
+import { useAuth } from '../contexts/AuthContext'; 
 import type { Service } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -24,9 +25,13 @@ function getGameImage(gameName?: string): string {
 
 export function ServicePage() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth(); 
   const [service, setService] = useState<Service | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     async function loadService() {
@@ -37,9 +42,7 @@ export function ServicePage() {
         const response = await fetch(`${API_URL}/services/${id}`);
         
         if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error('Услуга не найдена');
-          }
+          if (response.status === 404) throw new Error('Услуга не найдена');
           throw new Error('Ошибка сервера');
         }
 
@@ -55,20 +58,49 @@ export function ServicePage() {
 
         setService(normalizedService);
       } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('Неизвестная ошибка');
-        }
+        if (err instanceof Error) setError(err.message);
       } finally {
         setLoading(false);
       }
     }
 
-    if (id) {
-      loadService();
-    }
+    if (id) loadService();
   }, [id]);
+
+  useEffect(() => {
+    if (user && service) {
+      fetch(`${API_URL}/users/${user.id}/favorites`)
+        .then(res => res.json())
+        .then(favs => {
+          const isFav = favs.some((f: any) => f.id === service.id);
+          setIsFavorite(isFav);
+        })
+        .catch(err => console.error("Ошибка проверки избранного:", err));
+    }
+  }, [user, service]);
+
+  const toggleFavorite = async () => {
+    if (!user) {
+      navigate('/login'); 
+      return;
+    }
+
+    try {
+      if (isFavorite) {
+        await fetch(`${API_URL}/users/${user.id}/favorites/${service?.id}`, { method: 'DELETE' });
+        setIsFavorite(false);
+      } else {
+        await fetch(`${API_URL}/users/${user.id}/favorites`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ serviceId: service?.id })
+        });
+        setIsFavorite(true);
+      }
+    } catch (error) {
+      console.error('Ошибка изменения избранного:', error);
+    }
+  };
 
   if (loading) {
     return <div className="text-center py-20 text-[#805861]">Загрузка услуги...</div>;
@@ -81,12 +113,8 @@ export function ServicePage() {
         <p className="mt-2 text-sm text-[#805861]">
           {error || 'Возможно, она была удалена или больше недоступна.'}
         </p>
-        <Link
-          to="/catalog"
-          className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[#ff7186] hover:text-white"
-        >
-          <FiArrowLeft />
-          Вернуться в каталог
+        <Link to="/catalog" className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[#ff7186] hover:text-white">
+          <FiArrowLeft /> Вернуться в каталог
         </Link>
       </div>
     );
@@ -94,25 +122,17 @@ export function ServicePage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-8 sm:px-8 lg:px-10">
-      <Link
-        to="/catalog"
-        className="mb-6 inline-flex items-center gap-2 text-sm text-[#9e6b74] transition hover:text-white"
-      >
-        <FiArrowLeft />
-        Вернуться в каталог
+      <Link to="/catalog" className="mb-6 inline-flex items-center gap-2 text-sm text-[#9e6b74] transition hover:text-white">
+        <FiArrowLeft /> Вернуться в каталог
       </Link>
 
       <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
         <section className="overflow-hidden rounded-3xl border border-[#45101a] bg-[#100305]">
           <div className="aspect-video overflow-hidden bg-[#23070d]">
             {service.image ? (
-              <img
-                src={service.image}
-                alt={service.title}
-                className="h-full w-full object-cover"
-              />
+              <img src={service.image} alt={service.title} className="h-full w-full object-cover" />
             ) : (
-               <div className="flex h-full items-center justify-center text-[#805861]">Нет изображения</div>
+              <div className="flex h-full items-center justify-center text-[#805861]">Нет изображения</div>
             )}
           </div>
 
@@ -121,24 +141,14 @@ export function ServicePage() {
               <span className="rounded-full border border-[#741324] bg-[#26070e] px-3 py-1 text-xs text-[#ff9aaa]">
                 Игровая услуга
               </span>
-
               <span className="flex items-center gap-1 text-sm text-[#d9aeb6]">
-                <FiStar className="fill-current text-[#ffb000]" />
-                {service.rating}
+                <FiStar className="fill-current text-[#ffb000]" /> {service.rating}
               </span>
-
-              <span className="text-sm text-[#805861]">
-                {service.reviewsCount} отзывов
-              </span>
+              <span className="text-sm text-[#805861]">{service.reviewsCount} отзывов</span>
             </div>
 
-            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-              {service.title}
-            </h1>
-
-            <p className="mt-5 text-sm leading-7 text-[#b88b94]">
-              {service.description}
-            </p>
+            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{service.title}</h1>
+            <p className="mt-5 text-sm leading-7 text-[#b88b94]">{service.description}</p>
 
             <div className="mt-7 grid gap-3 sm:grid-cols-3">
               <div className="rounded-xl border border-[#45101a] bg-[#18050a] p-4">
@@ -146,17 +156,15 @@ export function ServicePage() {
                 <div className="text-sm font-semibold">Быстрое выполнение</div>
                 <div className="mt-1 text-xs text-[#805861]">Исполнитель сразу получит заказ</div>
               </div>
-
               <div className="rounded-xl border border-[#45101a] bg-[#18050a] p-4">
                 <FiShield className="mb-2 text-[#e5092f]" />
                 <div className="text-sm font-semibold">Безопасная сделка</div>
-                <div className="mt-1 text-xs text-[#805861]">Деньги защищены до завершения заказа</div>
+                <div className="mt-1 text-xs text-[#805861]">Деньги защищены до завершения</div>
               </div>
-
               <div className="rounded-xl border border-[#45101a] bg-[#18050a] p-4">
                 <FiStar className="mb-2 text-[#e5092f]" />
                 <div className="text-sm font-semibold">Высокий рейтинг</div>
-                <div className="mt-1 text-xs text-[#805861]">Проверенные отзывы покупателей</div>
+                <div className="mt-1 text-xs text-[#805861]">Проверенные отзывы</div>
               </div>
             </div>
           </div>
@@ -165,12 +173,13 @@ export function ServicePage() {
         <aside className="h-fit rounded-3xl border border-[#45101a] bg-[#100305] p-6 lg:sticky lg:top-24">
           <div className="flex items-center justify-between">
             <span className="text-sm text-[#805861]">Стоимость услуги</span>
+            
             <button
-              type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#45101a] text-[#b88b94] transition hover:border-[#8e0d24] hover:text-[#ff7186]"
+              onClick={toggleFavorite}
+              className={`flex h-10 w-10 items-center justify-center rounded-xl border border-[#45101a] transition hover:border-[#8e0d24] hover:text-[#ff7186] ${isFavorite ? 'text-[#ff7186]' : 'text-[#b88b94]'}`}
               aria-label="Добавить в избранное"
             >
-              <FiHeart />
+              <FiHeart className={isFavorite ? 'fill-current' : ''} />
             </button>
           </div>
 
@@ -179,16 +188,12 @@ export function ServicePage() {
           </div>
 
           <Link to={`/checkout/${service.id}`} className="block mt-6 w-full">
-            <Button className="w-full">
-              Купить услугу
-            </Button>
+            <Button className="w-full">Купить услугу</Button>
           </Link>
 
           <div className="my-6 h-px bg-[#45101a]" />
 
-          <div className="text-xs uppercase tracking-wider text-[#805861]">
-            Исполнитель
-          </div>
+          <div className="text-xs uppercase tracking-wider text-[#805861]">Исполнитель</div>
 
           <div className="mt-4 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#26070e] text-[#e5092f]">

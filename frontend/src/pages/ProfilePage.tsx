@@ -20,6 +20,7 @@ interface UserProfileData {
   email: string;
   balance: number;
   avatar: string | null;
+  bio: string | null; 
   ordersCount: number;
   favoritesCount: number;
 }
@@ -88,6 +89,12 @@ export function ProfilePage() {
 
             <h2 className="mt-4 text-xl font-bold">{profile.username}</h2>
             <p className="mt-1 text-sm text-[#805861]">{profile.email}</p>
+
+            {profile.bio && (
+              <p className="mt-4 text-sm text-[#c59ca4] italic">
+                "{profile.bio}"
+              </p>
+            )}
 
             <div className="mt-4 inline-flex items-center gap-1 rounded-full border border-[#741324] bg-[#26070e] px-3 py-1 text-xs text-[#ff9aaa]">
               <FiStar />
@@ -191,7 +198,7 @@ export function ProfilePage() {
               </Link>
             </div>
 
-                        <div className="divide-y divide-[#45101a]">
+            <div className="divide-y divide-[#45101a]">
               {profile.ordersCount > 0 ? (
                 <div className="p-6 text-center text-sm text-[#805861]">
                   У вас есть заказы, они отображаются в разделе "История заказов"
