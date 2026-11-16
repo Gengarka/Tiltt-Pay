@@ -226,6 +226,16 @@ app.post('/api/users/:userId/favorites', async (req, res) => {
   }
 });
 
+app.delete('/api/users/:userId/favorites/:serviceId', async (req, res) => {
+  try {
+    const { userId, serviceId } = req.params;
+    await pool.query('DELETE FROM favorites WHERE id_user = $1 AND id_service = $2', [userId, serviceId]);
+    res.json({ message: 'Удалено' });
+  } catch (error) {
+    res.status(500).json({ error: 'Ошибка' });
+  }
+});
+
 app.get('/api/games', async (req, res) => {
   try {
     const result = await pool.query('SELECT id_game AS id, name, genre FROM games ORDER BY id_game');
@@ -353,6 +363,15 @@ app.delete('/api/services/:id', async (req, res) => {
 app.get('/api/orders/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
+    
+    await pool.query(`
+      UPDATE orders 
+      SET id_status = 4 
+      WHERE id_buyer = $1 
+        AND id_status IN (1, 2) 
+        AND order_date < NOW() - INTERVAL '5 minutes'
+    `, [userId]);
+
     const query = `
       SELECT o.id_order AS id, o.id_service AS "serviceId", o.price, o.order_date AS date, 
              s.title, g.name AS game, os.name AS status
@@ -366,6 +385,7 @@ app.get('/api/orders/user/:userId', async (req, res) => {
     const result = await pool.query(query, [userId]);
     res.json(result.rows);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: 'Ошибка загрузки заказов' });
   }
 });
@@ -431,36 +451,28 @@ app.delete('/api/admin/services/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    await pool.query(
-      `DELETE FROM reviews WHERE id_order IN (SELECT id_order FROM orders WHERE id_service = $1)`, 
-      [id]
-    );
-
-    await pool.query(
-      `DELETE FROM payments WHERE id_order IN (SELECT id_order FROM orders WHERE id_service = $1)`, 
-      [id]
-    );
-
-    await pool.query(
-      `DELETE FROM order_status_history WHERE id_order IN (SELECT id_order FROM orders WHERE id_service = $1)`, 
-      [id]
-    );
-
-    await pool.query(
-      `DELETE FROM messages WHERE id_order IN (SELECT id_order FROM orders WHERE id_service = $1)`, 
-      [id]
-    );
-
+    await pool.query(`DELETE FROM disputes WHERE id_order IN (SELECT id_order FROM orders WHERE id_service = $1)`, [id]);
+    
+    await pool.query(`DELETE FROM messages WHERE id_order IN (SELECT id_order FROM orders WHERE id_service = $1)`, [id]);
+    
+    await pool.query(`DELETE FROM chats WHERE id_order IN (SELECT id_order FROM orders WHERE id_service = $1)`, [id]);
+    
+    await pool.query(`DELETE FROM reviews WHERE id_order IN (SELECT id_order FROM orders WHERE id_service = $1)`, [id]);
+    
+    await pool.query(`DELETE FROM order_status_history WHERE id_order IN (SELECT id_order FROM orders WHERE id_service = $1)`, [id]);
+    
+    await pool.query(`DELETE FROM payments WHERE id_order IN (SELECT id_order FROM orders WHERE id_service = $1)`, [id]);
+    
     await pool.query('DELETE FROM orders WHERE id_service = $1', [id]);
-
+    
     await pool.query('DELETE FROM favorites WHERE id_service = $1', [id]);
 
     await pool.query('DELETE FROM services WHERE id_service = $1', [id]);
 
-    res.json({ message: 'Услуга и все связанные данные удалены' });
+    res.json({ message: 'Услуга и все связанные данные успешно удалены' });
   } catch (error) {
     console.error('Ошибка удаления админом:', error.message);
-    res.status(500).json({ error: 'Ошибка удаления' });
+    res.status(500).json({ error: 'Ошибка удаления: ' + error.message });
   }
 });
 
