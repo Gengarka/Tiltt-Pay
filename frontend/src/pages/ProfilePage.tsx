@@ -91,7 +91,7 @@ export function ProfilePage() {
             <p className="mt-1 text-sm text-[#805861]">{profile.email}</p>
 
             {profile.bio && (
-              <p className="mt-4 text-sm text-[#c59ca4] italic">
+              <p className="mt-3 px-2 text-sm text-[#c59ca4] italic leading-relaxed">
                 "{profile.bio}"
               </p>
             )}

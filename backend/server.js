@@ -82,8 +82,8 @@ app.post('/api/auth/login', async (req, res) => {
 app.get('/api/users/:userId/profile', async (req, res) => {
   try {
     const { userId } = req.params;
-    const userResult = await pool.query(
-      'SELECT id_user AS id, username, email, balance, avatar_path AS avatar FROM users WHERE id_user = $1',
+        const userResult = await pool.query(
+      'SELECT id_user AS id, username, email, balance, avatar_path AS avatar, bio FROM users WHERE id_user = $1',
       [userId]
     );
     if (userResult.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
