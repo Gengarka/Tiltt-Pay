@@ -200,6 +200,32 @@ app.get('/api/users/:userId/favorites', async (req, res) => {
   }
 });
 
+app.post('/api/users/:userId/favorites', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { serviceId } = req.body;
+
+    if (!serviceId) return res.status(400).json({ error: 'Не указан ID услуги' });
+
+    const existing = await pool.query(
+      'SELECT * FROM favorites WHERE id_user = $1 AND id_service = $2',
+      [userId, serviceId]
+    );
+
+    if (existing.rows.length === 0) {
+      await pool.query(
+        'INSERT INTO favorites (id_user, id_service) VALUES ($1, $2)',
+        [userId, serviceId]
+      );
+    }
+
+    res.json({ message: 'Добавлено в избранное' });
+  } catch (error) {
+    console.error('Ошибка добавления в избранное:', error.message);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 app.get('/api/games', async (req, res) => {
   try {
     const result = await pool.query('SELECT id_game AS id, name, genre FROM games ORDER BY id_game');
