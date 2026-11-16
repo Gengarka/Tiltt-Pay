@@ -498,8 +498,108 @@ app.put('/api/admin/users/:userId/balance', async (req, res) => {
   }
 });
 
+app.post('/api/support', async (req, res) => {
+  try {
+    const { userId, message } = req.body;
+    if (!userId || !message) return res.status(400).json({ error: 'Заполните сообщение' });
+
+    const result = await pool.query(
+      'INSERT INTO support_tickets (id_user, message) VALUES ($1, $2) RETURNING id_ticket',
+      [userId, message]
+    );
+
+    res.status(201).json({ message: 'Обращение создано', id: result.rows[0].id_ticket });
+  } catch (error) {
+    console.error('Ошибка создания тикета:', error.message);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+app.get('/api/support/my/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await pool.query(
+      'SELECT * FROM support_tickets WHERE id_user = $1 ORDER BY created_at DESC',
+      [userId]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+app.get('/api/admin/support', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT t.*, u.username, u.email 
+       FROM support_tickets t
+       JOIN users u ON u.id_user = t.id_user
+       ORDER BY t.created_at DESC`
+    );
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+app.put('/api/admin/support/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reply } = req.body;
+
+    if (!reply) return res.status(400).json({ error: 'Введите ответ' });
+
+    await pool.query(
+      'UPDATE support_tickets SET admin_reply = $1, status = \'closed\' WHERE id_ticket = $2',
+      [reply, id]
+    );
+
+    res.json({ message: 'Ответ отправлен' });
+  } catch (error) {
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+app.get('/api/admin/notifications', async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
+    );
+    res.json({ unreadCount: parseInt(result.rows[0].count, 10) });
+  } catch (error) {
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+app.get('/api/users/:userId/notifications', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const result = await pool.query(
+      `SELECT COUNT(*) FROM support_tickets 
+       WHERE id_user = $1 AND admin_reply IS NOT NULL AND is_read_by_user = FALSE`,
+      [userId]
+    );
+    res.json({ unreadCount: parseInt(result.rows[0].count, 10) });
+  } catch (error) {
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+app.put('/api/users/:userId/notifications/read', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    await pool.query(
+      'UPDATE support_tickets SET is_read_by_user = TRUE WHERE id_user = $1',
+      [userId]
+    );
+    res.json({ message: 'Прочитано' });
+  } catch (error) {
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
-  console.log(`Backend запущен: http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Backend запущен: http://0.0.0.0:${PORT}`);
 });
