@@ -20,7 +20,7 @@ export function PaymentPage() {
   }
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/[^0-9]/g, ''); // Убираем всё, кроме цифр
+    const value = e.target.value.replace(/[^0-9]/g, ''); 
     setAmount(value);
   };
 
