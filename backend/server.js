@@ -238,7 +238,7 @@ app.delete('/api/users/:userId/favorites/:serviceId', async (req, res) => {
 
 app.get('/api/games', async (req, res) => {
   try {
-    const result = await pool.query('SELECT id_game AS id, name, genre FROM games ORDER BY id_game');
+    const result = await pool.query('SELECT id_game AS id, name, genre, cover_url AS image FROM games ORDER BY id_game');
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({ error: 'Ошибка загрузки игр' });

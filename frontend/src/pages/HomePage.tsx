@@ -31,11 +31,17 @@ export function HomePage() {
           fetch(`${API_URL}/services`)
         ]);
 
-        if (gamesRes.ok && servicesRes.ok) {
+               if (gamesRes.ok && servicesRes.ok) {
           const gamesData = await gamesRes.json();
           const servicesData = await servicesRes.json();
 
-          setGames(gamesData);
+          const normalizedGames = gamesData.map((g: any) => ({
+            ...g,
+            image: g.image || 'https://via.placeholder.com/400x200?text=Game', 
+            category: g.genre || 'Игра', 
+          }));
+
+          setGames(normalizedGames);
           
           const normalizedServices = servicesData.slice(0, 4).map((s: any) => ({
             ...s,

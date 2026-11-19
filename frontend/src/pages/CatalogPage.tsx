@@ -1,5 +1,5 @@
-
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom'; 
 import { FiSearch } from 'react-icons/fi';
 
 import { FilterPanel } from '../components/home/FilterPanel';
@@ -32,12 +32,21 @@ function getGameImage(gameName?: string): string {
 }
 
 export function CatalogPage() {
+  const [searchParams] = useSearchParams(); 
+  const gameFromUrl = searchParams.get('game'); 
+
   const [services, setServices] = useState<Service[]>([]);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('all');
   const [sort, setSort] = useState('popular');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (gameFromUrl) {
+      setSearch(gameFromUrl);
+    }
+  }, [gameFromUrl]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -154,7 +163,11 @@ export function CatalogPage() {
       <div className="mb-5">
         <CategoryTabs
           activeCategory={category}
-          onCategoryChange={setCategory}
+          onCategoryChange={(newCat) => {
+            setCategory(newCat);
+            // Если нажали "Все", сбрасываем поиск (чтобы не было привязки к игре)
+            if (newCat === 'all') setSearch('');
+          }}
         />
       </div>
 
