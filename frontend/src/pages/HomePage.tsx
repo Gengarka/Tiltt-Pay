@@ -17,6 +17,24 @@ interface Game {
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
+function getGameImage(gameName?: string): string {
+  const name = (gameName ?? '').toLowerCase();
+  
+  if (name.includes('apex')) return '/images/games/apex.webp';
+  if (name.includes('counter-strike') || name.includes('cs2')) return '/images/games/cs2.webp';
+  if (name.includes('dota')) return '/images/games/dota.jpg';
+  if (name.includes('fortnite')) return '/images/games/fortnite.webp';
+  if (name.includes('genshin')) return '/images/games/genshin.jpg';
+  if (name.includes('gta')) return '/images/games/gta v.webp';
+  if (name.includes('minecraft')) return '/images/games/minecraft.jpg';
+  if (name.includes('pubg')) return '/images/games/pubg.webp';
+  if (name.includes('roblox')) return '/images/games/roblox.webp';
+  if (name.includes('valorant')) return '/images/games/valorant.webp';
+  if (name.includes('world of tanks') || name.includes('wot')) return '/images/games/wot.webp';
+  
+  return 'https://via.placeholder.com/400x200?text=Game';
+}
+
 export function HomePage() {
   const [games, setGames] = useState<Game[]>([]);
   const [services, setServices] = useState<Service[]>([]);
@@ -31,13 +49,13 @@ export function HomePage() {
           fetch(`${API_URL}/services`)
         ]);
 
-               if (gamesRes.ok && servicesRes.ok) {
+        if (gamesRes.ok && servicesRes.ok) {
           const gamesData = await gamesRes.json();
           const servicesData = await servicesRes.json();
 
           const normalizedGames = gamesData.map((g: any) => ({
             ...g,
-            image: g.image || 'https://via.placeholder.com/400x200?text=Game', 
+            image: g.image || getGameImage(g.name), 
             category: g.genre || 'Игра', 
           }));
 
@@ -45,7 +63,7 @@ export function HomePage() {
           
           const normalizedServices = servicesData.slice(0, 4).map((s: any) => ({
             ...s,
-            image: s.image || '', 
+            image: s.image || getGameImage(s.gameName), 
             rating: Number(s.rating) || 0,
             reviewsCount: Number(s.reviewsCount) || 0,
             price: Number(s.price) || 0,
