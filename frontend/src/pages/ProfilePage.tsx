@@ -20,9 +20,10 @@ interface UserProfileData {
   email: string;
   balance: number;
   avatar: string | null;
-  bio: string | null; 
+  bio: string | null;
   ordersCount: number;
   favoritesCount: number;
+  lastOrder: any | null;
 }
 
 export function ProfilePage() {
@@ -105,40 +106,21 @@ export function ProfilePage() {
           <div className="my-6 h-px bg-[#45101a]" />
 
           <nav className="space-y-1">
-            <Link
-              to="/profile"
-              className="flex items-center gap-3 rounded-xl bg-[#8e0d24] px-4 py-3 text-sm font-medium text-white"
-            >
+            <Link to="/profile" className="flex items-center gap-3 rounded-xl bg-[#8e0d24] px-4 py-3 text-sm font-medium text-white">
               <FiUser /> Профиль
             </Link>
-
-            <Link
-              to="/orders"
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#b88b94] transition hover:bg-[#26070e] hover:text-white"
-            >
+            <Link to="/orders" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#b88b94] transition hover:bg-[#26070e] hover:text-white">
               <FiPackage /> История заказов
             </Link>
-
-            <Link
-              to="/favorites"
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#b88b94] transition hover:bg-[#26070e] hover:text-white"
-            >
+            <Link to="/favorites" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#b88b94] transition hover:bg-[#26070e] hover:text-white">
               <FiHeart /> Избранное
             </Link>
-
-            <Link
-              to="/settings"
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#b88b94] transition hover:bg-[#26070e] hover:text-white"
-            >
+            <Link to="/settings" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#b88b94] transition hover:bg-[#26070e] hover:text-white">
               <FiSettings /> Настройки
             </Link>
           </nav>
 
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="mt-5 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#d86d7e] transition hover:bg-[#2a0710]"
-          >
+          <button type="button" onClick={handleLogout} className="mt-5 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#d86d7e] transition hover:bg-[#2a0710]">
             <FiLogOut /> Выйти
           </button>
         </aside>
@@ -153,11 +135,7 @@ export function ProfilePage() {
                 </div>
                 <p className="mt-2 text-xs text-[#805861]">Доступно для покупок</p>
               </div>
-
-              <Link
-                to="/payment"
-                className="rounded-xl bg-[#8e0d24] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#e5092f]"
-              >
+              <Link to="/payment" className="rounded-xl bg-[#8e0d24] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#e5092f]">
                 Пополнить
               </Link>
             </div>
@@ -169,13 +147,11 @@ export function ProfilePage() {
               <div className="mt-4 text-2xl font-bold">{profile.ordersCount}</div>
               <div className="mt-1 text-sm text-[#805861]">Заказов</div>
             </div>
-
             <div className="rounded-2xl border border-[#45101a] bg-[#100305] p-5">
               <FiHeart className="text-[#e5092f]" />
               <div className="mt-4 text-2xl font-bold">{profile.favoritesCount}</div>
               <div className="mt-1 text-sm text-[#805861]">Избранных услуг</div>
             </div>
-
             <div className="rounded-2xl border border-[#45101a] bg-[#100305] p-5">
               <FiStar className="text-[#e5092f]" />
               <div className="mt-4 text-2xl font-bold">{profile.ordersCount > 0 ? '4.9' : '0'}</div>
@@ -189,20 +165,38 @@ export function ProfilePage() {
                 <h2 className="font-bold">Последние заказы</h2>
                 <p className="mt-1 text-xs text-[#805861]">Твои последние покупки</p>
               </div>
-              <Link
-                to="/orders"
-                className="flex items-center gap-1 text-sm text-[#ff7186] hover:text-white"
-              >
-                Все заказы
-                <FiChevronRight />
+              <Link to="/orders" className="flex items-center gap-1 text-sm text-[#ff7186] hover:text-white">
+                Все заказы <FiChevronRight />
               </Link>
             </div>
 
             <div className="divide-y divide-[#45101a]">
-              {profile.ordersCount > 0 ? (
-                <div className="p-6 text-center text-sm text-[#805861]">
-                  У вас есть заказы, они отображаются в разделе "История заказов"
-                </div>
+                           {profile.lastOrder ? (
+                <Link to="/orders" className="flex items-center justify-between p-5 hover:bg-[#18050a] transition block">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#26070e] text-[#e5092f]">
+                      <FiPackage />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm font-semibold text-white">{profile.lastOrder.title}</div>
+                        <span className={`px-2 py-1 rounded text-[10px] font-medium border ${
+                          profile.lastOrder.status === 'Завершён' 
+                            ? 'border-[#1d6338] text-[#70d99a]' 
+                            : 'border-[#72591c] text-[#e8c96b]'
+                        }`}>
+                          {profile.lastOrder.status}
+                        </span>
+                      </div>
+                      <div className="mt-1 text-xs text-[#805861]">
+                        Заказ #{profile.lastOrder.id} • {profile.lastOrder.game} • {new Date(profile.lastOrder.date).toLocaleDateString('ru-RU')}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-sm font-bold text-white">
+                    {Number(profile.lastOrder.price).toLocaleString('ru-RU')} ₽
+                  </span>
+                </Link>
               ) : (
                 <div className="flex flex-col items-center justify-center p-8 text-center">
                   <FiPackage className="text-3xl text-[#45101a] mb-3" />

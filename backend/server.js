@@ -82,7 +82,7 @@ app.post('/api/auth/login', async (req, res) => {
 app.get('/api/users/:userId/profile', async (req, res) => {
   try {
     const { userId } = req.params;
-        const userResult = await pool.query(
+    const userResult = await pool.query(
       'SELECT id_user AS id, username, email, balance, avatar_path AS avatar, bio FROM users WHERE id_user = $1',
       [userId]
     );
@@ -91,13 +91,29 @@ app.get('/api/users/:userId/profile', async (req, res) => {
     const user = userResult.rows[0];
     const ordersCountResult = await pool.query('SELECT COUNT(*) FROM orders WHERE id_buyer = $1', [userId]);
     const favoritesCountResult = await pool.query('SELECT COUNT(*) FROM favorites WHERE id_user = $1', [userId]);
+    
+    const lastOrderResult = await pool.query(
+      `SELECT o.id_order AS id, o.price, o.order_date AS date, s.title, g.name AS game, os.name AS status
+       FROM orders o
+       JOIN services s ON s.id_service = o.id_service
+       JOIN games g ON g.id_game = s.id_game
+       JOIN order_statuses os ON os.id_status = o.id_status
+       WHERE o.id_buyer = $1
+       ORDER BY 
+         CASE WHEN os.name IN ('Новый', 'Ожидает оплаты', 'В работе') THEN 0 ELSE 1 END,
+         o.order_date DESC 
+       LIMIT 1`,
+      [userId]
+    );
 
     res.json({
       ...user,
       ordersCount: parseInt(ordersCountResult.rows[0].count, 10),
       favoritesCount: parseInt(favoritesCountResult.rows[0].count, 10),
+      lastOrder: lastOrderResult.rows[0] || null 
     });
   } catch (error) {
+    console.error('Ошибка загрузки профиля:', error.message);
     res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
