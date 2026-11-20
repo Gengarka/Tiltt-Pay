@@ -303,15 +303,33 @@ app.get('/api/services/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const query = `
-      SELECT s.id_service AS id, s.title, s.description, s.price, s.id_game AS "gameId", s.id_seller AS "sellerId", 
-             s.category, s.image_url AS image, g.name AS "gameName", u.username AS "sellerName",
-             COALESCE(AVG(r.rating), 0) AS rating, COUNT(r.id_review) AS "reviewsCount"
+      SELECT
+        s.id_service AS id,
+        s.title,
+        s.description,
+        s.price,
+        s.id_game AS "gameId",
+        s.id_seller AS "sellerId",
+        s.category,
+        s.image_url AS image,
+        g.name AS "gameName",
+        u.username AS "sellerName",
+        COALESCE((
+          SELECT AVG(r.rating)
+          FROM reviews r
+          JOIN orders o ON o.id_order = r.id_order
+          WHERE o.id_service = s.id_service
+        ), 0) AS rating,
+        (
+          SELECT COUNT(*)
+          FROM reviews r
+          JOIN orders o ON o.id_order = r.id_order
+          WHERE o.id_service = s.id_service
+        ) AS "reviewsCount"
       FROM services s
       LEFT JOIN games g ON g.id_game = s.id_game
       LEFT JOIN users u ON u.id_user = s.id_seller
-      LEFT JOIN reviews r ON r.id_seller = s.id_seller
       WHERE s.id_service = $1
-      GROUP BY s.id_service, g.name, u.username, s.image_url
     `;
     const result = await pool.query(query, [id]);
     if (result.rows.length === 0) return res.status(404).json({ error: 'Услуга не найдена' });
@@ -611,6 +629,89 @@ app.put('/api/users/:userId/notifications/read', async (req, res) => {
     res.json({ message: 'Прочитано' });
   } catch (error) {
     res.status(500).json({ error: 'Ошибка сервера' });
+  }
+});
+
+app.get('/api/services/:id/reviews', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      `SELECT
+         r.id_review AS id,
+         r.rating,
+         r.text AS comment,
+         r.review_date AS date,
+         u.username AS author,
+         u.avatar_path AS avatar
+       FROM reviews r
+       JOIN orders o ON o.id_order = r.id_order
+       JOIN users u ON u.id_user = r.id_author
+       WHERE o.id_service = $1
+       ORDER BY r.review_date DESC`,
+      [id]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Ошибка загрузки отзывов:', error.message);
+    res.status(500).json({ error: 'Ошибка загрузки отзывов', details: error.message });
+  }
+});
+
+app.post('/api/reviews', async (req, res) => {
+  try {
+    const { orderId, authorId, rating, comment } = req.body; 
+
+    if (!orderId || !rating) {
+      return res.status(400).json({ error: 'Укажите оценку' });
+    }
+
+    const reviewText = comment || ''; 
+
+    const orderCheck = await pool.query(
+      'SELECT id_seller, id_status FROM orders WHERE id_order = $1 AND id_buyer = $2',
+      [orderId, authorId]
+    );
+
+    if (orderCheck.rows.length === 0) {
+      return res.status(403).json({ error: 'Вы не можете оставить отзыв на этот заказ' });
+    }
+
+    if (orderCheck.rows[0].id_status !== 4) {
+      return res.status(400).json({ error: 'Отзыв можно оставить только после завершения заказа' });
+    }
+
+    const sellerId = orderCheck.rows[0].id_seller;
+
+    const existingReview = await pool.query(
+      'SELECT * FROM reviews WHERE id_order = $1',
+      [orderId]
+    );
+
+    if (existingReview.rows.length > 0) {
+      return res.status(400).json({ error: 'Вы уже оставили отзыв на этот заказ' });
+    }
+
+    await pool.query(
+      `INSERT INTO reviews (id_order, id_author, id_seller, rating, text, review_date)
+       VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)`,
+      [orderId, authorId, sellerId, rating, reviewText]
+    );
+
+    res.status(201).json({ message: 'Отзыв добавлен' });
+  } catch (error) {
+    console.error('Ошибка добавления отзыва:', error.message);
+    res.status(500).json({ error: 'Ошибка сервера: ' + error.message });
+  }
+});
+
+app.delete('/api/admin/reviews/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM reviews WHERE id_review = $1', [id]);
+    res.json({ message: 'Отзыв удален' });
+  } catch (error) {
+    res.status(500).json({ error: 'Ошибка при удалении' });
   }
 });
 
