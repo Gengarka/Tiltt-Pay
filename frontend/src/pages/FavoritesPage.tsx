@@ -59,7 +59,7 @@ export function FavoritesPage() {
   }, [user, isLoading, navigate]);
 
   if (isLoading || loading) {
-    return <div className="py-16 text-center text-[#805861]">Загрузка...</div>;
+    return <div className="py-16 text-center text-[#b88b94]">Загрузка...</div>;
   }
 
   return (
@@ -74,7 +74,7 @@ export function FavoritesPage() {
       <div className="mb-8">
         <p className="mb-2 text-sm font-medium text-[#e5092f]">Личный кабинет</p>
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Избранное</h1>
-        <p className="mt-2 text-sm text-[#805861]">Услуги, которые вы сохранили на будущее.</p>
+        <p className="mt-2 text-sm text-[#b88b94]">Услуги, которые вы сохранили на будущее.</p>
       </div>
 
       {favorites.length > 0 ? (
@@ -87,7 +87,7 @@ export function FavoritesPage() {
         <div className="rounded-3xl border border-[#45101a] bg-[#100305] px-5 py-16 text-center">
           <FiHeart className="mx-auto text-3xl text-[#8e0d24]" />
           <h2 className="mt-4 text-lg font-bold">В избранном пока пусто</h2>
-          <p className="mt-2 text-sm text-[#805861]">Добавляйте услуги в избранное, чтобы не потерять их.</p>
+          <p className="mt-2 text-sm text-[#b88b94]">Добавляйте услуги в избранное, чтобы не потерять их.</p>
           <Link
             to="/catalog"
             className="mt-6 inline-flex rounded-xl bg-[#8e0d24] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#e5092f]"

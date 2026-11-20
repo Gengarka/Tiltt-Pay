@@ -95,7 +95,7 @@ export function HomePage() {
             <span className="text-[#e5092f]">всё для гейминга</span>
           </h1>
 
-          <p className="mb-7 max-w-xl text-sm leading-6 text-[#c59ca4] sm:text-base">
+          <p className="mb-7 max-w-xl text-sm leading-6 text-[#b88b94] sm:text-base">
             Покупай игровые услуги у проверенных исполнителей,
             находи нужные товары и получай всё быстро и удобно.
           </p>
@@ -124,7 +124,7 @@ export function HomePage() {
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold">Популярные игры</h2>
-            <p className="mt-1 text-sm text-[#805861]">
+            <p className="mt-1 text-sm text-[#b88b94]">
               Выбирай игру и находи нужные услуги
             </p>
           </div>
@@ -140,7 +140,7 @@ export function HomePage() {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {loading ? (
-             <div className="col-span-full text-center py-4 text-[#805861]">Загрузка игр...</div>
+             <div className="col-span-full text-center py-4 text-[#b88b94]">Загрузка игр...</div>
           ) : (
             games.map((game) => (
               <GameCard key={game.id} game={game} />
@@ -153,7 +153,7 @@ export function HomePage() {
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold">Популярные услуги</h2>
-            <p className="mt-1 text-sm text-[#805861]">
+            <p className="mt-1 text-sm text-[#b88b94]">
               То, что сейчас чаще всего выбирают пользователи
             </p>
           </div>
@@ -169,7 +169,7 @@ export function HomePage() {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {loading ? (
-             <div className="col-span-full text-center py-4 text-[#805861]">Загрузка услуг...</div>
+             <div className="col-span-full text-center py-4 text-[#b88b94]">Загрузка услуг...</div>
           ) : (
             services.map((service) => (
               <ServiceCard

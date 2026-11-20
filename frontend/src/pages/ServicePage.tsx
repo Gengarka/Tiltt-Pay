@@ -173,7 +173,7 @@ export function ServicePage() {
     }
   };
 
-  if (loading) return <div className="text-center py-20 text-[#805861]">Загрузка...</div>;
+  if (loading) return <div className="text-center py-20 text-[#b88b94]">Загрузка...</div>;
   if (error || !service) {
     return (
       <div className="text-center py-20">
@@ -207,7 +207,7 @@ export function ServicePage() {
                 <span className="flex items-center gap-1 text-sm text-[#d9aeb6]">
                   <FiStar className="fill-current text-[#ffb000]" /> {Number(service.rating).toFixed(1)}
                 </span>
-                <span className="text-sm text-[#805861]">{service.reviewsCount} отзывов</span>
+                <span className="text-sm text-[#b88b94]">{service.reviewsCount} отзывов</span>
               </div>
               <h1 className="text-3xl font-extrabold tracking-tight">{service.title}</h1>
               <p className="mt-5 text-sm leading-7 text-[#b88b94]">{service.description}</p>
@@ -223,7 +223,7 @@ export function ServicePage() {
                 <div className="flex gap-1 mb-3">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button key={star} type="button" onClick={() => setRating(star)}>
-                      <FiStar className={`text-2xl ${star <= rating ? 'fill-[#ffb000] text-[#ffb000]' : 'text-[#805861]'}`} />
+                      <FiStar className={`text-2xl ${star <= rating ? 'fill-[#ffb000] text-[#ffb000]' : 'text-[#b88b94]'}`} />
                     </button>
                   ))}
                 </div>
@@ -246,7 +246,7 @@ export function ServicePage() {
             )}
 
             {reviews.length === 0 ? (
-              <p className="text-sm text-[#805861]">Пока нет отзывов. Будьте первым!</p>
+              <p className="text-sm text-[#b88b94]">Пока нет отзывов. Будьте первым!</p>
             ) : (
               <div className="space-y-4">
                 {reviews.map((rev) => (
@@ -267,7 +267,7 @@ export function ServicePage() {
                       <div className="flex-1">
                         <div className="flex justify-between items-center mb-1">
                           <span className="font-bold text-sm text-white">{rev.author || 'Пользователь'}</span>
-                          <span className="text-xs text-[#805861]">{new Date(rev.date).toLocaleDateString('ru-RU')}</span>
+                          <span className="text-xs text-[#b88b94]">{new Date(rev.date).toLocaleDateString('ru-RU')}</span>
                         </div>
                         
                         <div className="flex gap-0.5 mb-2">
@@ -292,7 +292,7 @@ export function ServicePage() {
 
         <aside className="h-fit rounded-3xl border border-[#45101a] bg-[#100305] p-6 lg:sticky lg:top-24">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-[#805861]">Стоимость услуги</span>
+            <span className="text-sm text-[#b88b94]">Стоимость услуги</span>
             <button onClick={toggleFavorite} className={`flex h-10 w-10 items-center justify-center rounded-xl border border-[#45101a] transition hover:border-[#8e0d24] hover:text-[#ff7186] ${isFavorite ? 'text-[#ff7186]' : 'text-[#b88b94]'}`}>
               <FiHeart className={isFavorite ? 'fill-current' : ''} />
             </button>
@@ -304,14 +304,14 @@ export function ServicePage() {
           </Link>
 
           <div className="my-6 h-px bg-[#45101a]" />
-          <div className="text-xs uppercase tracking-wider text-[#805861]">Исполнитель</div>
+          <div className="text-xs uppercase tracking-wider text-[#b88b94]">Исполнитель</div>
           <div className="mt-4 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#26070e] text-[#e5092f]">
               <FiCheckCircle />
             </div>
             <div>
               <div className="font-semibold">{service.sellerName || 'Продавец'}</div>
-              <div className="mt-1 text-xs text-[#805861]">Проверенный продавец</div>
+              <div className="mt-1 text-xs text-[#b88b94]">Проверенный продавец</div>
             </div>
           </div>
         </aside>

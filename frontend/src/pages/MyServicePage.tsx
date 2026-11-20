@@ -54,7 +54,7 @@ export function MyServicesPage() {
     }
   };
 
-  if (authLoading || loading) return <div className="py-20 text-center text-[#805861]">Загрузка...</div>;
+  if (authLoading || loading) return <div className="py-20 text-center text-[#b88b94]">Загрузка...</div>;
 
   return (
     <div className="mx-auto w-full max-w-5xl px-5 py-8">
@@ -79,7 +79,7 @@ export function MyServicesPage() {
         <div className="rounded-3xl border border-[#45101a] bg-[#100305] px-5 py-16 text-center">
           <FiPackage className="mx-auto text-4xl text-[#8e0d24] mb-4" />
           <h2 className="text-lg font-bold">У вас пока нет услуг</h2>
-          <p className="mt-2 text-sm text-[#805861]">Создайте свою первую услугу и начните зарабатывать!</p>
+          <p className="mt-2 text-sm text-[#b88b94]">Создайте свою первую услугу и начните зарабатывать!</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -87,7 +87,7 @@ export function MyServicesPage() {
             <div key={service.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 rounded-2xl border border-[#45101a] bg-[#100305] gap-4">
               <div>
                 <h2 className="font-bold text-lg">{service.title}</h2>
-                <p className="text-sm text-[#805861]">Игра: {service.gameName} • Категория: {service.category}</p>
+                <p className="text-sm text-[#b88b94]">Игра: {service.gameName} • Категория: {service.category}</p>
                 <div className="mt-2 flex items-center gap-3">
                   <span className="text-lg font-bold text-[#e5092f]">{Number(service.price).toLocaleString('ru-RU')} ₽</span>
                   <span className={`px-2 py-1 rounded text-xs border ${service.status === 'active' ? 'border-[#1d6338] text-[#70d99a]' : 'border-[#72591c] text-[#e8c96b]'}`}>

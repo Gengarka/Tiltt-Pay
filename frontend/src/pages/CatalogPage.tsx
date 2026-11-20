@@ -130,7 +130,7 @@ export function CatalogPage() {
       <div className="mb-8">
         <p className="mb-2 text-sm font-medium text-[#e5092f]">Каталог</p>
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Игры и услуги</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-[#805861]">
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-[#b88b94]">
           Найди нужную игру, услугу или товар среди предложений пользователей.
         </p>
       </div>
@@ -165,11 +165,11 @@ export function CatalogPage() {
       </div>
 
       {loading ? (
-        <div className="py-16 text-center text-[#805861]">Загружаем услуги из базы данных...</div>
+        <div className="py-16 text-center text-[#b88b94]">Загружаем услуги из базы данных...</div>
       ) : error ? (
         <div className="rounded-2xl border border-[#45101a] bg-[#100305] px-5 py-16 text-center">
           <h2 className="text-lg font-bold">Не удалось загрузить каталог</h2>
-          <p className="mt-2 text-sm text-[#805861]">{error}</p>
+          <p className="mt-2 text-sm text-[#b88b94]">{error}</p>
           <button onClick={() => window.location.reload()} className="mt-4 rounded-xl bg-[#e5092f] px-5 py-2 text-sm font-semibold text-white">Повторить</button>
         </div>
       ) : filteredServices.length > 0 ? (
@@ -181,7 +181,7 @@ export function CatalogPage() {
       ) : (
         <div className="rounded-2xl border border-[#45101a] bg-[#100305] px-5 py-16 text-center">
           <h2 className="text-lg font-bold">Ничего не найдено</h2>
-          <p className="mt-2 text-sm text-[#805861]">Попробуй изменить поисковый запрос или фильтры.</p>
+          <p className="mt-2 text-sm text-[#b88b94]">Попробуй изменить поисковый запрос или фильтры.</p>
         </div>
       )}
     </div>

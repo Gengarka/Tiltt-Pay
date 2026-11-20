@@ -98,7 +98,7 @@ export function SettingsPage() {
             onChange={handleImageChange} 
             className="hidden" 
           />
-          <p className="mt-3 text-xs text-[#805861]">Нажмите на фото, чтобы изменить</p>
+          <p className="mt-3 text-xs text-[#b88b94]">Нажмите на фото, чтобы изменить</p>
         </div>
 
         <div className="space-y-6">

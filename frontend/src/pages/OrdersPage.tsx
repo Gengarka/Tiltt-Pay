@@ -69,7 +69,7 @@ export default function OrdersPage() {
   }, [user, authLoading, navigate]);
 
   if (authLoading || loading) {
-    return <div className="py-10 text-center text-[#805861]">Загрузка заказов из БД...</div>;
+    return <div className="py-10 text-center text-[#b88b94]">Загрузка заказов из БД...</div>;
   }
 
   return (
@@ -89,7 +89,7 @@ export default function OrdersPage() {
         <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
           История заказов
         </h1>
-        <p className="mt-2 text-sm text-[#805861]">
+        <p className="mt-2 text-sm text-[#b88b94]">
           Здесь собраны все твои заказы.
         </p>
       </div>
@@ -98,7 +98,7 @@ export default function OrdersPage() {
         <div className="rounded-3xl border border-[#45101a] bg-[#100305] px-5 py-16 text-center">
           <FiPackage className="mx-auto text-3xl text-[#8e0d24]" />
           <h2 className="mt-4 text-lg font-bold">Заказов пока нет</h2>
-          <p className="mt-2 text-sm text-[#805861]">
+          <p className="mt-2 text-sm text-[#b88b94]">
             После первой покупки она появится здесь.
           </p>
           <Link
@@ -140,7 +140,7 @@ export default function OrdersPage() {
                         </span>
                       </div>
 
-                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#805861]">
+                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#b88b94]">
                         <span>Заказ #{order.id}</span>
                         <span>{order.game}</span>
                         <span>{formattedDate}</span>
@@ -150,7 +150,7 @@ export default function OrdersPage() {
 
                   <div className="flex items-center justify-between gap-5 border-t border-[#45101a] pt-4 lg:border-0 lg:pt-0">
                     <div>
-                      <div className="text-xs text-[#805861]">Сумма</div>
+                      <div className="text-xs text-[#b88b94]">Сумма</div>
                       <div className="mt-1 text-lg font-bold">
                         {Number(order.price).toLocaleString('ru-RU')} ₽
                       </div>

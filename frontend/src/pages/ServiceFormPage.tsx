@@ -143,7 +143,7 @@ export function ServiceFormPage() {
           </div>
           <div>
             <h3 className="font-medium text-[#d9aeb6]">Обложка услуги</h3>
-            <p className="text-xs text-[#805861] mt-1">Нажмите на квадрат, чтобы выбрать картинку (до 2 МБ)</p>
+            <p className="text-xs text-[#b88b94] mt-1">Нажмите на квадрат, чтобы выбрать картинку (до 2 МБ)</p>
           </div>
         </div>
 

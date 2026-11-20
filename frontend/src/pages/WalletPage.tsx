@@ -73,9 +73,9 @@ export function WalletPage() {
           <h2 className="font-bold text-lg mb-6">История операций</h2>
           
           {loading ? (
-            <div className="text-center py-8 text-[#805861]">Загрузка...</div>
+            <div className="text-center py-8 text-[#b88b94]">Загрузка...</div>
           ) : payments.length === 0 ? (
-            <div className="text-center py-8 text-[#805861] border border-dashed border-[#45101a] rounded-xl">
+            <div className="text-center py-8 text-[#b88b94] border border-dashed border-[#45101a] rounded-xl">
               У вас пока нет операций
             </div>
           ) : (
@@ -90,7 +90,7 @@ export function WalletPage() {
                       <p className="font-semibold text-sm">
                         {payment.service_title ? `Покупка: ${payment.service_title}` : 'Пополнение баланса'}
                       </p>
-                      <p className="text-xs text-[#805861]">
+                      <p className="text-xs text-[#b88b94]">
                         {new Date(payment.date).toLocaleString('ru-RU')} • {payment.payment_method || 'СБП'}
                       </p>
                     </div>

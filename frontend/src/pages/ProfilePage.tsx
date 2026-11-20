@@ -65,7 +65,7 @@ export function ProfilePage() {
   };
 
   if (authLoading || loading) {
-    return <div className="text-center py-10 text-[#805861]">Загрузка профиля...</div>;
+    return <div className="text-center py-10 text-[#b88b94]">Загрузка профиля...</div>;
   }
 
   if (!profile) {
@@ -89,10 +89,10 @@ export function ProfilePage() {
             />
 
             <h2 className="mt-4 text-xl font-bold">{profile.username}</h2>
-            <p className="mt-1 text-sm text-[#805861]">{profile.email}</p>
+            <p className="mt-1 text-sm text-[#b88b94]">{profile.email}</p>
 
             {profile.bio && (
-              <p className="mt-3 px-2 text-sm text-[#c59ca4] italic leading-relaxed">
+              <p className="mt-3 px-2 text-sm text-[#b88b94] italic leading-relaxed">
                 "{profile.bio}"
               </p>
             )}
@@ -133,7 +133,7 @@ export function ProfilePage() {
                 <div className="mt-2 text-4xl font-extrabold">
                   {Number(profile.balance).toLocaleString('ru-RU')} ₽
                 </div>
-                <p className="mt-2 text-xs text-[#805861]">Доступно для покупок</p>
+                <p className="mt-2 text-xs text-[#b88b94]">Доступно для покупок</p>
               </div>
               <Link to="/payment" className="rounded-xl bg-[#8e0d24] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#e5092f]">
                 Пополнить
@@ -145,17 +145,17 @@ export function ProfilePage() {
             <div className="rounded-2xl border border-[#45101a] bg-[#100305] p-5">
               <FiShoppingBag className="text-[#e5092f]" />
               <div className="mt-4 text-2xl font-bold">{profile.ordersCount}</div>
-              <div className="mt-1 text-sm text-[#805861]">Заказов</div>
+              <div className="mt-1 text-sm text-[#b88b94]">Заказов</div>
             </div>
             <div className="rounded-2xl border border-[#45101a] bg-[#100305] p-5">
               <FiHeart className="text-[#e5092f]" />
               <div className="mt-4 text-2xl font-bold">{profile.favoritesCount}</div>
-              <div className="mt-1 text-sm text-[#805861]">Избранных услуг</div>
+              <div className="mt-1 text-sm text-[#b88b94]">Избранных услуг</div>
             </div>
             <div className="rounded-2xl border border-[#45101a] bg-[#100305] p-5">
               <FiStar className="text-[#e5092f]" />
               <div className="mt-4 text-2xl font-bold">{profile.ordersCount > 0 ? '4.9' : '0'}</div>
-              <div className="mt-1 text-sm text-[#805861]">Средняя оценка</div>
+              <div className="mt-1 text-sm text-[#b88b94]">Средняя оценка</div>
             </div>
           </section>
 
@@ -163,7 +163,7 @@ export function ProfilePage() {
             <div className="flex items-center justify-between border-b border-[#45101a] px-6 py-5">
               <div>
                 <h2 className="font-bold">Последние заказы</h2>
-                <p className="mt-1 text-xs text-[#805861]">Твои последние покупки</p>
+                <p className="mt-1 text-xs text-[#b88b94]">Твои последние покупки</p>
               </div>
               <Link to="/orders" className="flex items-center gap-1 text-sm text-[#ff7186] hover:text-white">
                 Все заказы <FiChevronRight />
@@ -188,7 +188,7 @@ export function ProfilePage() {
                           {profile.lastOrder.status}
                         </span>
                       </div>
-                      <div className="mt-1 text-xs text-[#805861]">
+                      <div className="mt-1 text-xs text-[#b88b94]">
                         Заказ #{profile.lastOrder.id} • {profile.lastOrder.game} • {new Date(profile.lastOrder.date).toLocaleDateString('ru-RU')}
                       </div>
                     </div>
@@ -200,7 +200,7 @@ export function ProfilePage() {
               ) : (
                 <div className="flex flex-col items-center justify-center p-8 text-center">
                   <FiPackage className="text-3xl text-[#45101a] mb-3" />
-                  <p className="text-sm text-[#805861]">
+                  <p className="text-sm text-[#b88b94]">
                     У вас пока нет заказов. <br /> 
                     <Link to="/catalog" className="text-[#ff7186] hover:text-white mt-2 inline-block">
                       Перейти в каталог

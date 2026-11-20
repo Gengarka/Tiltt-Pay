@@ -32,7 +32,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
 
           <span>{service.rating}</span>
 
-          <span className="text-[#805861]">
+          <span className="text-[#b88b94]">
             ({service.reviewsCount})
           </span>
         </div>

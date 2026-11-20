@@ -70,7 +70,7 @@ export function RegisterPage() {
             Т
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight">Создание аккаунта</h1>
-          <p className="mt-2 text-sm text-[#805861]">Присоединяйся к Тильт-платеж</p>
+          <p className="mt-2 text-sm text-[#b88b94]">Присоединяйся к Тильт-платеж</p>
         </div>
 
         <form
@@ -83,7 +83,7 @@ export function RegisterPage() {
                 Имя пользователя
               </label>
               <div className="relative">
-                <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-[#805861]" />
+                <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-[#b88b94]" />
                 <input
                   id="username"
                   type="text"
@@ -100,7 +100,7 @@ export function RegisterPage() {
                 Email
               </label>
               <div className="relative">
-                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#805861]" />
+                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#b88b94]" />
                 <input
                   id="email"
                   type="email"
@@ -117,7 +117,7 @@ export function RegisterPage() {
                 Пароль
               </label>
               <div className="relative">
-                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#805861]" />
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#b88b94]" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -129,7 +129,7 @@ export function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-[#805861] transition hover:bg-[#26070e] hover:text-white"
+                  className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-[#b88b94] transition hover:bg-[#26070e] hover:text-white"
                 >
                   {showPassword ? <FiEyeOff /> : <FiEye />}
                 </button>
@@ -157,7 +157,7 @@ export function RegisterPage() {
             <div className="h-px flex-1 bg-[#45101a]" />
           </div>
 
-          <p className="text-center text-sm text-[#805861]">
+          <p className="text-center text-sm text-[#b88b94]">
             Уже есть аккаунт?{' '}
             <Link to="/login" className="font-semibold text-[#ff7186] transition hover:text-white">
               Войти

@@ -64,7 +64,7 @@ export function LoginPage() {
             Т
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight">С возвращением</h1>
-          <p className="mt-2 text-sm text-[#805861]">Войди в аккаунт, чтобы продолжить</p>
+          <p className="mt-2 text-sm text-[#b88b94]">Войди в аккаунт, чтобы продолжить</p>
         </div>
 
         <form onSubmit={handleSubmit} className="rounded-3xl border border-[#45101a] bg-[#100305] p-6 shadow-2xl shadow-black/20 sm:p-8">
@@ -72,7 +72,7 @@ export function LoginPage() {
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-medium text-[#d9aeb6]">Email</label>
               <div className="relative">
-                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#805861]" />
+                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#b88b94]" />
                 <input
                   id="email"
                   type="email"
@@ -90,7 +90,7 @@ export function LoginPage() {
                 <button type="button" className="text-xs text-[#ff7186] transition hover:text-white">Забыли пароль?</button>
               </div>
               <div className="relative">
-                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#805861]" />
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#b88b94]" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -102,7 +102,7 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((value) => !value)}
-                  className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-[#805861] transition hover:bg-[#26070e] hover:text-white"
+                  className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-[#b88b94] transition hover:bg-[#26070e] hover:text-white"
                 >
                   {showPassword ? <FiEyeOff /> : <FiEye />}
                 </button>
@@ -130,7 +130,7 @@ export function LoginPage() {
             <div className="h-px flex-1 bg-[#45101a]" />
           </div>
 
-          <p className="text-center text-sm text-[#805861]">
+          <p className="text-center text-sm text-[#b88b94]">
             Нет аккаунта?{' '}
             <Link to="/register" className="font-semibold text-[#ff7186] transition hover:text-white">
               Зарегистрироваться

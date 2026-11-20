@@ -78,7 +78,7 @@ export function CheckoutPage() {
     }
   };
 
-  if (loading) return <div className="py-20 text-center text-[#805861]">Загрузка...</div>;
+  if (loading) return <div className="py-20 text-center text-[#b88b94]">Загрузка...</div>;
   if (!service) return <div className="py-20 text-center text-[#ff8798]">Услуга не найдена</div>;
 
   return (
@@ -93,13 +93,13 @@ export function CheckoutPage() {
         <div className="flex justify-between items-center border-b border-[#45101a] pb-4 mb-4">
           <div>
             <p className="font-bold text-lg">{service.title}</p>
-            <p className="text-sm text-[#805861]">Продавец: {service.sellerName}</p>
+            <p className="text-sm text-[#b88b94]">Продавец: {service.sellerName}</p>
           </div>
           <div className="text-2xl font-bold text-[#e5092f]">{service.price} ₽</div>
         </div>
 
         <div className="flex justify-between items-center text-sm mb-8">
-          <span className="text-[#805861]">Ваш текущий баланс:</span>
+          <span className="text-[#b88b94]">Ваш текущий баланс:</span>
           <span className={user!.balance < service.price ? 'text-red-500 font-bold' : 'text-green-500 font-bold'}>
             {user!.balance} ₽
           </span>
@@ -123,7 +123,7 @@ export function CheckoutPage() {
           <div className="text-center bg-[#18050a] border border-[#5c101e] rounded-2xl p-6">
             <FiCheckCircle className="mx-auto text-5xl text-green-500 mb-4" />
             <h2 className="text-xl font-bold mb-2">Заказ успешно оплачен!</h2>
-            <p className="text-sm text-[#805861] mb-6">Средства списаны с баланса. Продавец свяжется с вами.</p>
+            <p className="text-sm text-[#b88b94] mb-6">Средства списаны с баланса. Продавец свяжется с вами.</p>
             
             <Link to="/orders" className="block w-full rounded-xl bg-[#8e0d24] py-3 text-white font-bold hover:bg-[#e5092f]">
               Перейти в историю заказов

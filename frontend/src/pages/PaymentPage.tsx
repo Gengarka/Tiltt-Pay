@@ -82,7 +82,7 @@ export function PaymentPage() {
 
       <div className="rounded-3xl border border-[#45101a] bg-[#100305] p-6 sm:p-8 text-center">
         <h1 className="text-2xl font-extrabold mb-2">Пополнение кошелька</h1>
-        <p className="text-sm text-[#805861] mb-8">Выберите сумму и оплатите по QR-коду</p>
+        <p className="text-sm text-[#b88b94] mb-8">Выберите сумму и оплатите по QR-коду</p>
 
         {error && (
           <div className="mb-6 rounded-xl border border-[#7d1728] bg-[#2a0710] px-4 py-3 text-sm text-[#ff9aaa] font-medium text-left">
@@ -102,7 +102,7 @@ export function PaymentPage() {
                 placeholder="Введите сумму"
                 className="h-14 w-full text-center text-2xl font-bold rounded-xl border border-[#45101a] bg-[#18050a] text-white outline-none focus:border-[#e5092f] transition"
               />
-              <p className="text-xs text-[#805861] mt-2">Минимум 100 ₽, максимум 69 000 ₽</p>
+              <p className="text-xs text-[#b88b94] mt-2">Минимум 100 ₽, максимум 69 000 ₽</p>
             </div>
             <button
               onClick={handleProceed}

@@ -18,7 +18,7 @@ export function GameCard({ game }: GameCardProps) {
             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
           />
         ) : (
-           <div className="flex h-full items-center justify-center text-[#805861]">Нет фото</div>
+           <div className="flex h-full items-center justify-center text-[#b88b94]">Нет фото</div>
         )}
       </div>
 

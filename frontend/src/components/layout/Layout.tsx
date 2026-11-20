@@ -48,10 +48,11 @@ export function Layout() {
             lg:static lg:translate-x-0`}
         >
           <div className="flex justify-end mb-4 lg:hidden">
-            <button
-              onClick={() => setIsSidebarOpen(false)}
-              className="p-2 text-[#c59ca4] hover:text-white"
-            >
+           <button
+            onClick={() => setIsSidebarOpen(false)}
+            aria-label="Закрыть меню"
+            className="p-2 text-[#b88b94] hover:text-white"
+          >
               <FiX size={24} />
             </button>
           </div>
@@ -68,7 +69,7 @@ export function Layout() {
                     `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
                       isActive
                         ? 'bg-[#8e0d24] text-white'
-                        : 'text-[#c59ca4] hover:bg-[#26070e] hover:text-white'
+                        : 'text-[#b88b94] hover:bg-[#26070e] hover:text-white'
                     }`
                   }
                 >

@@ -94,7 +94,7 @@ export function AdminPage() {
     }
   };
 
-  if (authLoading || loading) return <div className="py-20 text-center text-[#805861]">Загрузка...</div>;
+  if (authLoading || loading) return <div className="py-20 text-center text-[#b88b94]">Загрузка...</div>;
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-8">
@@ -111,9 +111,9 @@ export function AdminPage() {
           <div className="bg-[#100305] border border-[#45101a] rounded-3xl p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold">Пользователь: {editingUser.username}</h2>
-              <button onClick={() => setEditingUser(null)} className="text-[#805861] hover:text-white"><FiX size={24} /></button>
+              <button onClick={() => setEditingUser(null)} className="text-[#b88b94] hover:text-white"><FiX size={24} /></button>
             </div>
-            <p className="text-sm text-[#805861] mb-4">Текущий баланс: <span className="text-white font-bold">{Number(editingUser.balance).toLocaleString('ru-RU')} ₽</span></p>
+            <p className="text-sm text-[#b88b94] mb-4">Текущий баланс: <span className="text-white font-bold">{Number(editingUser.balance).toLocaleString('ru-RU')} ₽</span></p>
             <label className="block text-sm text-[#d9aeb6] mb-2">Изменить баланс (например +500 или -100)</label>
             <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="w-full h-12 rounded-xl border border-[#45101a] bg-[#18050a] px-4 text-white outline-none focus:border-[#e5092f]" />
             <button onClick={handleUpdateBalance} className="w-full mt-4 bg-[#8e0d24] hover:bg-[#e5092f] text-white font-bold py-3 rounded-xl">Применить</button>
@@ -126,10 +126,10 @@ export function AdminPage() {
           <div className="bg-[#100305] border border-[#45101a] rounded-3xl p-6 w-full max-w-lg">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Ответ пользователю {replyTicket.username}</h2>
-              <button onClick={() => setReplyTicket(null)} className="text-[#805861] hover:text-white"><FiX size={24} /></button>
+              <button onClick={() => setReplyTicket(null)} className="text-[#b88b94] hover:text-white"><FiX size={24} /></button>
             </div>
             <div className="p-3 bg-[#18050a] rounded-xl mb-4 border border-[#45101a]">
-              <p className="text-xs text-[#805861] mb-1">Сообщение:</p>
+              <p className="text-xs text-[#b88b94] mb-1">Сообщение:</p>
               <p className="text-sm text-white">{replyTicket.message}</p>
             </div>
             <textarea value={replyText} onChange={(e) => setReplyText(e.target.value)} rows={4} placeholder="Напишите ответ..." className="w-full rounded-xl border border-[#45101a] bg-[#18050a] p-4 text-white outline-none focus:border-[#e5092f] resize-none" />
@@ -148,7 +148,7 @@ export function AdminPage() {
         {activeTab === 'users' && (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-              <thead><tr className="border-b border-[#45101a] text-[#805861] text-sm">
+              <thead><tr className="border-b border-[#45101a] text-[#b88b94] text-sm">
                 <th className="pb-3 px-2">ID</th><th className="pb-3 px-2">Имя</th><th className="pb-3 px-2">Email</th><th className="pb-3 px-2">Роль</th><th className="pb-3 px-2">Баланс</th><th className="pb-3 px-2">Действия</th>
               </tr></thead>
               <tbody>
@@ -171,7 +171,7 @@ export function AdminPage() {
           <div className="space-y-4">
             {services.map(s => (
               <div key={s.id} className="flex items-center justify-between p-4 rounded-xl border border-[#45101a] bg-[#18050a]">
-                <div><h3 className="font-bold">{s.title}</h3><p className="text-sm text-[#805861]">Продавец: {s.sellerName}</p></div>
+                <div><h3 className="font-bold">{s.title}</h3><p className="text-sm text-[#b88b94]">Продавец: {s.sellerName}</p></div>
                 <div className="flex items-center gap-4">
                   <span className="font-bold text-[#e5092f]">{Number(s.price).toLocaleString('ru-RU')} ₽</span>
                   <button onClick={() => handleDeleteService(s.id)} className="p-2 rounded-lg text-[#ff7186] hover:bg-[#2a0710] transition"><FiTrash2 size={20} /></button>
@@ -188,7 +188,7 @@ export function AdminPage() {
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <span className="font-bold text-white">{t.username}</span>
-                    <span className="text-sm text-[#805861] ml-2">({t.email})</span>
+                    <span className="text-sm text-[#b88b94] ml-2">({t.email})</span>
                   </div>
                   <span className={`text-xs px-2 py-1 rounded ${t.status === 'closed' ? 'bg-[#0b2818] text-[#70d99a]' : 'bg-[#2a0710] text-[#ff8798]'}`}>
                     {t.status === 'closed' ? 'Закрыт' : 'Открыт'}
