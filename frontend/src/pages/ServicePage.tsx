@@ -154,14 +154,12 @@ export function ServicePage() {
       setComment('');
       setHasBought(false);
 
-      // Подтягиваем новый отзыв без полной перезагрузки страницы.
       const reviewsRes = await fetch(`${API_URL}/services/${id}/reviews`);
       if (!reviewsRes.ok) {
         throw new Error('Отзыв сохранён, но список отзывов не удалось обновить');
       }
       setReviews(await reviewsRes.json());
 
-      // Обновляем рейтинг и количество отзывов в шапке услуги.
       const serviceRes = await fetch(`${API_URL}/services/${id}`);
       if (serviceRes.ok) {
         const serviceData = await serviceRes.json();
@@ -216,11 +214,9 @@ export function ServicePage() {
             </div>
           </div>
 
-                    {/* БЛОК С ОТЗЫВАМИ */}
           <div className="rounded-3xl border border-[#45101a] bg-[#100305] p-6">
             <h2 className="font-bold text-lg mb-4">Отзывы ({reviews.length})</h2>
             
-            {/* Форма добавления отзыва */}
             {hasBought && (
               <form onSubmit={handleSubmitReview} className="mb-6 p-4 rounded-xl border border-[#741324] bg-[#26070e]">
                 <p className="text-sm font-bold text-white mb-2">Оставить отзыв</p>
@@ -249,7 +245,6 @@ export function ServicePage() {
               </form>
             )}
 
-            {/* Список отзывов */}
             {reviews.length === 0 ? (
               <p className="text-sm text-[#805861]">Пока нет отзывов. Будьте первым!</p>
             ) : (
@@ -257,7 +252,6 @@ export function ServicePage() {
                 {reviews.map((rev) => (
                   <div key={rev.id} className="p-4 rounded-xl border border-[#45101a] bg-[#18050a]">
                     <div className="flex items-start gap-3">
-                      {/* Аватар автора; если изображения нет, показываем первую букву ника */}
                       {rev.avatar ? (
                         <img
                           src={rev.avatar}
@@ -276,7 +270,6 @@ export function ServicePage() {
                           <span className="text-xs text-[#805861]">{new Date(rev.date).toLocaleDateString('ru-RU')}</span>
                         </div>
                         
-                        {/* Звездочки в отзыве */}
                         <div className="flex gap-0.5 mb-2">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <FiStar 

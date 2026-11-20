@@ -283,18 +283,28 @@ app.get('/api/services', async (req, res) => {
     const query = `
       SELECT s.id_service AS id, s.title, s.description, s.price, s.id_game AS "gameId", s.id_seller AS "sellerId", 
              s.category, s.image_url AS image, g.name AS "gameName", u.username AS "sellerName",
-             COALESCE(AVG(r.rating), 0) AS rating, COUNT(r.id_review) AS "reviewsCount"
+             COALESCE((
+               SELECT AVG(r.rating)
+               FROM reviews r
+               JOIN orders o ON o.id_order = r.id_order
+               WHERE o.id_service = s.id_service
+             ), 0) AS rating,
+             (
+               SELECT COUNT(*)
+               FROM reviews r
+               JOIN orders o ON o.id_order = r.id_order
+               WHERE o.id_service = s.id_service
+             ) AS "reviewsCount"
       FROM services s
       LEFT JOIN games g ON g.id_game = s.id_game
       LEFT JOIN users u ON u.id_user = s.id_seller
-      LEFT JOIN reviews r ON r.id_seller = s.id_seller
       WHERE s.status = 'active'
-      GROUP BY s.id_service, g.name, u.username, s.image_url
       ORDER BY s.id_service;
     `;
     const result = await pool.query(query);
     res.json(result.rows);
   } catch (error) {
+    console.error('Ошибка загрузки услуг:', error.message);
     res.status(500).json({ error: 'Ошибка загрузки услуг' });
   }
 });
@@ -661,6 +671,8 @@ app.get('/api/services/:id/reviews', async (req, res) => {
 app.post('/api/reviews', async (req, res) => {
   try {
     const { orderId, authorId, rating, comment } = req.body; 
+
+    console.log('Получены данные для отзыва:', { orderId, authorId, rating, comment });
 
     if (!orderId || !rating) {
       return res.status(400).json({ error: 'Укажите оценку' });
