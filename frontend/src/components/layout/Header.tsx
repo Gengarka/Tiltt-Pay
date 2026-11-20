@@ -30,7 +30,11 @@ export function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
     <header className="sticky top-0 z-40 flex min-h-16 w-full items-center border-b border-[#45101a] bg-[#100305] px-4 sm:px-6 lg:px-8">
       <div className="flex w-full items-center gap-4">
         
-        <button onClick={toggleSidebar} className="lg:hidden p-2 -ml-2 text-[#d9aeb6] hover:text-white">
+        <button 
+          onClick={toggleSidebar} 
+          aria-label="Открыть меню" 
+          className="lg:hidden p-2 -ml-2 text-[#d9aeb6] hover:text-white"
+        >
           <FiMenu size={24} />
         </button>
 
@@ -53,16 +57,17 @@ export function Header({ toggleSidebar }: { toggleSidebar: () => void }) {
         <div className="flex shrink-0 items-center gap-3">
           
          <Link 
-            to={user?.role === 'admin' ? '/admin' : '/support'} 
-            className="relative flex h-10 w-10 items-center justify-center rounded-xl text-xl text-[#d9aeb6] transition hover:bg-[#26070e] hover:text-white"
-            >
-            <FiBell />
-            {hasUnread && (
-              <span className="absolute top-2 right-2 flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#e5092f] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#e5092f]"></span>
-              </span>
-            )}
+           to={user?.role === 'admin' ? '/admin' : '/support'} 
+           aria-label={user?.role === 'admin' ? 'Перейти в админ-панель' : 'Служба поддержки'}
+           className="relative flex h-10 w-10 items-center justify-center rounded-xl text-xl text-[#d9aeb6] transition hover:bg-[#26070e] hover:text-white"
+          >
+           <FiBell />
+           {hasUnread && (
+             <span className="absolute top-2 right-2 flex h-2.5 w-2.5">
+             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#e5092f] opacity-75"></span>
+             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#e5092f]"></span>
+             </span>
+             )}
           </Link>
           {user ? (
             <Link to="/profile" className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition hover:bg-[#26070e]">
