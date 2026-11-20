@@ -59,3 +59,26 @@
 * Speed Index: 0.7 s
 
 ![Результаты Lighthouse для главной страницы](screenshots/home_run1.png)
+
+### 2.2. Страница Каталога (/catalog)
+
+**Результаты трех запусков:**
+* Запуск 1: Performance 100, Accessibility 84, Best Practices 100, SEO 100.
+* Запуск 2: Performance 100, Accessibility 84, Best Practices 100, SEO 100.
+* Запуск 3: Performance 100, Accessibility 84, Best Practices 100, SEO 100.
+
+**Медианные значения:** 
+* Performance: **100**
+* Accessibility: **84** 
+* Best Practices: **100**
+* SEO: **100**
+
+**Метрики производительности (первый запуск):**
+* FCP (First Contentful Paint): 0.7 s
+* LCP (Largest Contentful Paint): 0.7 s
+* TBT (Total Blocking Time): 0 ms
+* CLS (Cumulative Layout Shift): 0
+* Speed Index: 0.7 s
+
+![Результаты Lighthouse для страницы каталога](screenshots/catalog_run1.png)
+*Рисунок 4 — Оценки Lighthouse для страницы каталога*
