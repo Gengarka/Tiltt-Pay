@@ -168,18 +168,46 @@ export function AdminPage() {
         )}
 
         {activeTab === 'services' && (
-          <div className="space-y-4">
-            {services.map(s => (
-              <div key={s.id} className="flex items-center justify-between p-4 rounded-xl border border-[#45101a] bg-[#18050a]">
-                <div><h3 className="font-bold">{s.title}</h3><p className="text-sm text-[#b88b94]">Продавец: {s.sellerName}</p></div>
-                <div className="flex items-center gap-4">
-                  <span className="font-bold text-[#e5092f]">{Number(s.price).toLocaleString('ru-RU')} ₽</span>
-                  <button onClick={() => handleDeleteService(s.id)} className="p-2 rounded-lg text-[#ff7186] hover:bg-[#2a0710] transition"><FiTrash2 size={20} /></button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+  <div className="space-y-4">
+    {services.map(s => (
+      <div 
+        key={s.id} 
+        onClick={() => navigate(`/service/${s.id}`, { state: { fromAdmin: true } })}
+        className="flex items-center justify-between p-4 rounded-xl border border-[#45101a] bg-[#18050a] cursor-pointer hover:bg-[#23070d] transition"
+      >
+        <div>
+          <h3 className="font-bold">{s.title}</h3>
+          <p className="text-sm text-[#b88b94]">Продавец: {s.sellerName}</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="font-bold text-[#e5092f]">{Number(s.price).toLocaleString('ru-RU')} ₽</span>
+          
+          <button 
+            onClick={(e) => {
+              e.stopPropagation(); 
+              navigate(`/admin/services/edit/${s.id}`);
+            }} 
+            className="p-2 rounded-lg text-[#b88b94] hover:bg-[#26070e] hover:text-white transition"
+            title="Редактировать услугу"
+          >
+            <FiEdit size={20} />
+          </button>
+
+          <button 
+            onClick={(e) => {
+              e.stopPropagation(); 
+              handleDeleteService(s.id);
+            }} 
+            className="p-2 rounded-lg text-[#ff7186] hover:bg-[#2a0710] transition"
+            title="Удалить услугу"
+          >
+            <FiTrash2 size={20} />
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
 
         {activeTab === 'support' && (
           <div className="space-y-4">

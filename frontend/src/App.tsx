@@ -42,6 +42,7 @@ function App() {
           <Route path="/my-services/edit/:id" element={<ServiceFormPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="support" element={<SupportPage />} />
+          <Route path="/admin/services/edit/:id" element={<ServiceFormPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -5,7 +5,7 @@ import {
   FiHeart,
   FiStar,
 } from 'react-icons/fi';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
@@ -41,6 +41,8 @@ function getGameImage(gameName?: string): string {
 export function ServicePage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isFromAdmin = location.state?.fromAdmin === true;
   const { user } = useAuth(); 
   
   const [service, setService] = useState<Service | null>(null);
@@ -178,16 +180,25 @@ export function ServicePage() {
     return (
       <div className="text-center py-20">
         <h1 className="text-2xl font-bold">Услуга не найдена</h1>
-        <Link to="/catalog" className="mt-4 text-[#ff7186]">Вернуться в каталог</Link>
+        <button 
+  onClick={() => navigate(isFromAdmin ? '/admin' : '/catalog')} 
+  className="mb-6 inline-flex items-center gap-2 text-sm text-[#9e6b74] hover:text-white"
+>
+  <FiArrowLeft /> {isFromAdmin ? 'Вернуться в админ-панель' : 'Вернуться в каталог'}
+</button>
       </div>
     );
   }
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-8">
-      <Link to="/catalog" className="mb-6 inline-flex items-center gap-2 text-sm text-[#9e6b74] hover:text-white">
-        <FiArrowLeft /> Вернуться в каталог
-      </Link>
+      <button 
+      onClick={() => navigate(isFromAdmin ? '/admin' : '/catalog')} 
+      className="mb-6 inline-flex items-center gap-2 text-sm text-[#9e6b74] hover:text-white"
+    >
+      <FiArrowLeft /> {isFromAdmin ? 'Вернуться в админ-панель' : 'Вернуться в каталог'}
+    </button>
+
 
       <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
         <section className="space-y-6">

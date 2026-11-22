@@ -11,6 +11,8 @@ export function ServiceFormPage() {
   
   const { id } = useParams(); 
   const isEditing = Boolean(id);
+  
+  const isAdmin = user?.role === 'admin';
 
   const [games, setGames] = useState<any[]>([]);
   const [title, setTitle] = useState('');
@@ -39,6 +41,11 @@ export function ServiceFormPage() {
       fetch(`${API_URL}/services/${id}`)
         .then(res => res.json())
         .then(data => {
+          if (!isAdmin && data.sellerId !== user?.id) {
+            navigate('/my-services');
+            return;
+          }
+
           setTitle(data.title);
           setGameName(data.gameName || '');
           setPrice(data.price.toString());
@@ -48,7 +55,7 @@ export function ServiceFormPage() {
         })
         .catch(err => console.error('Ошибка загрузки:', err));
     }
-  }, [isEditing, id]);
+  }, [isEditing, id, isAdmin, user, navigate]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -103,7 +110,7 @@ export function ServiceFormPage() {
 
       if (!res.ok) throw new Error(data.error || 'Ошибка при сохранении');
 
-      navigate('/my-services'); 
+      navigate(isAdmin ? '/admin' : '/my-services'); 
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -113,8 +120,11 @@ export function ServiceFormPage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-5 py-8">
-      <Link to="/my-services" className="mb-6 inline-flex items-center gap-2 text-sm text-[#9e6b74] hover:text-white">
-        <FiArrowLeft /> Назад к услугам
+      <Link 
+        to={isAdmin ? '/admin' : '/my-services'} 
+        className="mb-6 inline-flex items-center gap-2 text-sm text-[#9e6b74] hover:text-white"
+      >
+        <FiArrowLeft /> {isAdmin ? 'Назад в админ-панель' : 'Назад к услугам'}
       </Link>
 
       <div className="mb-8">
@@ -125,7 +135,6 @@ export function ServiceFormPage() {
 
       <form onSubmit={handleSubmit} className="rounded-3xl border border-[#45101a] bg-[#100305] p-6 sm:p-8 space-y-5">
         
-        {/* Поле для картинки */}
         <div className="flex items-center gap-6 mb-4">
           <div className="w-32 h-32 rounded-xl border border-dashed border-[#45101a] bg-[#18050a] flex items-center justify-center overflow-hidden relative group">
             {image ? (
