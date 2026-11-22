@@ -13,7 +13,7 @@ export function ServiceCard({ service }: ServiceCardProps) {
       <Link to={`/service/${service.id}`}>
         <div className="aspect-[16/9] overflow-hidden bg-[#23070d]">
           <img
-            src={service.image || 'https://via.placeholder.com/400'}
+            src={service.image || '/images/games/placeholder.webp'}
             alt={service.title}
             className="h-48 w-full object-cover"
           />

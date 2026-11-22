@@ -10,12 +10,20 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 function getGameImage(gameName?: string): string {
   const name = (gameName ?? '').toLowerCase();
-  if (name.includes('minecraft')) return 'https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png';
-  if (name.includes('genshin')) return 'https://upload.wikimedia.org/wikipedia/en/5/5d/Genshin_Impact_logo.svg';
-  if (name.includes('counter-strike') || name.includes('cs2')) return 'https://cdn.cloudflare.steamstatic.com/steam/apps/730/header.jpg';
-  if (name.includes('dota')) return 'https://cdn.cloudflare.steamstatic.com/steam/apps/570/header.jpg';
-  return '';
+  if (name.includes('apex')) return '/images/games/apex.webp';
+  if (name.includes('counter-strike') || name.includes('cs2')) return '/images/games/cs2.webp';
+  if (name.includes('dota')) return '/images/games/dota.jpg';
+  if (name.includes('fortnite')) return '/images/games/fortnite.webp';
+  if (name.includes('genshin')) return '/images/games/genshin.jpg';
+  if (name.includes('gta')) return '/images/games/gta v.webp';
+  if (name.includes('minecraft')) return '/images/games/minecraft.jpg';
+  if (name.includes('pubg')) return '/images/games/pubg.webp';
+  if (name.includes('roblox')) return '/images/games/roblox.webp';
+  if (name.includes('valorant')) return '/images/games/valorant.webp';
+  if (name.includes('world of tanks') || name.includes('wot')) return '/images/games/wot.webp';
+  return 'https://via.placeholder.com/400x200?text=Game';
 }
+
 
 export function FavoritesPage() {
   const { user, isLoading } = useAuth(); 
