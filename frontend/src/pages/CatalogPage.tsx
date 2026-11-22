@@ -121,6 +121,7 @@ export function CatalogPage() {
     if (sort === 'rating') result = [...result].sort((a, b) => b.rating - a.rating);
     if (sort === 'price-low') result = [...result].sort((a, b) => a.price - b.price);
     if (sort === 'price-high') result = [...result].sort((a, b) => b.price - a.price);
+    if (sort === 'popular') result = [...result].sort((a, b) => b.reviewsCount - a.reviewsCount);
 
     return result;
   }, [services, search, category, sort]);
